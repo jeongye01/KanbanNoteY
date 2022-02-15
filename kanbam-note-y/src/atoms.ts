@@ -1,24 +1,31 @@
-import { atom } from "recoil";
+import { atom, selector, useRecoilValue } from 'recoil';
 
-interface Itodo {
+export interface Itask {
   id: number;
   content: string;
 }
-interface IboardsState {
-  [key: string]: Itodo[];
+export interface IboardsState {
+  [key: string]: Itask[];
 }
 
 export const boardsState = atom<IboardsState>({
-  key: "boards",
+  key: 'boards',
   default: {
     ToDo: [
-      { id: Date.now(), content: "a" },
-      { id: Date.now(), content: "b" },
+      { id: 1, content: 'a' },
+      { id: 2, content: 'b' },
     ],
+
     Doing: [
-      { id: Date.now(), content: "c" },
-      { id: Date.now(), content: "d" },
+      { id: 3, content: 'c' },
+      { id: 4, content: 'd' },
     ],
-    Done: [{ id: Date.now(), content: "e" }],
+
+    Done: [{ id: 5, content: 'e' }],
   },
+});
+
+export const boardsOrderState = atom<string[]>({
+  key: 'boardsOrder',
+  default: ['ToDo', 'Doing', 'Done'],
 });
