@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Draggable } from 'react-beautiful-dnd';
-import { Itask } from '../atoms';
 import styled from 'styled-components';
-
+import { faPenToSquare, faTrashCan } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { boardsOrderState, boardsState, Itask } from '../atoms';
+import { useSetRecoilState } from 'recoil';
 const List = styled.li<{ isDragging: boolean }>`
   border: 1px solid lightgrey;
   border-radius: 2px;
@@ -12,11 +14,44 @@ const List = styled.li<{ isDragging: boolean }>`
 `;
 
 interface Iprops {
+  boardKey: string;
   task: Itask;
   idx: number;
 }
-function Task({ task, idx }: Iprops) {
-  console.log(task.content, 'render');
+function Task({ boardKey, task, idx }: Iprops) {
+  const [updatedTaskName, setUpdatedTaskName] = useState<string>(task.content);
+  const [isEditActive, setIsEditActive] = useState<boolean>(false);
+
+  const setBoards = useSetRecoilState(boardsState);
+
+  const onTaskSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    setBoards((prev) => {
+      const copyBoard = { ...prev[boardKey] };
+      const copyTasks = [...copyBoard.tasks];
+      const { id } = copyTasks[idx];
+      copyTasks.splice(idx, 0, { id, content: updatedTaskName });
+      copyTasks.splice(idx + 1, 1);
+
+      return { ...prev, [`${boardKey}`]: { name: copyBoard.name, tasks: copyTasks } };
+    });
+    setIsEditActive(false);
+  };
+  const onTaskChanged = (event: React.FormEvent<HTMLInputElement>) => {
+    setUpdatedTaskName(event.currentTarget.value);
+  };
+
+  const onTaskDelete = () => {
+    setBoards((prev) => {
+      const copyBoard = { ...prev[boardKey] };
+      const copyTasks = [...copyBoard.tasks];
+
+      copyTasks.splice(idx, 1);
+
+      return { ...prev, [`${boardKey}`]: { name: copyBoard.name, tasks: copyTasks } };
+    });
+  };
   return (
     <Draggable draggableId={`${task.id}`} index={idx}>
       {(provided, snapshot) => (
@@ -26,7 +61,22 @@ function Task({ task, idx }: Iprops) {
           {...provided.draggableProps}
           isDragging={snapshot.isDragging}
         >
-          <span>🔥{task.content}</span>
+          {isEditActive ? (
+            <form onSubmit={onTaskSubmit}>
+              <input onChange={onTaskChanged} type="text" value={updatedTaskName} />
+              <input type="submit" value="저장" />
+            </form>
+          ) : (
+            <>
+              <span>🔥{task.content}</span>
+              <button onClick={() => setIsEditActive(true)}>
+                <FontAwesomeIcon icon={faPenToSquare} />
+              </button>
+              <button onClick={onTaskDelete}>
+                <FontAwesomeIcon icon={faTrashCan} />
+              </button>
+            </>
+          )}
         </List>
       )}
     </Draggable>

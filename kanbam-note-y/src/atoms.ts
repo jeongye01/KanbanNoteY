@@ -15,27 +15,21 @@ export interface IboardsState {
 export const boardsState = atom<IboardsState>({
   key: 'boards',
   default: {
-    '1': {
+    ToDo: {
       name: 'ToDo',
-      tasks: [
-        { id: 11, content: 'a' },
-        { id: 12, content: 'b' },
-      ],
+      tasks: [],
     },
 
-    '2': {
+    Doing: {
       name: 'Doing',
-      tasks: [
-        { id: 23, content: 'c' },
-        { id: 24, content: 'd' },
-      ],
+      tasks: [],
     },
 
-    '3': { name: 'Done', tasks: [] },
+    Done: { name: 'Done', tasks: [] },
   },
 });
 
 export const boardsOrderState = atom<string[]>({
   key: 'boardsOrder',
-  default: ['1', '2', '3'],
+  default: ['ToDo', 'Doing', 'Done'],
 });

@@ -13,7 +13,7 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
 `;
-const Title = styled.h3`
+const Title = styled.button`
   padding: 8px;
 `;
 const TaskList = styled.ul<{ isDraggingOver: boolean }>`
@@ -32,9 +32,27 @@ interface Iprops {
 }
 function Board({ board, boardKey, index }: Iprops) {
   console.log(boardKey, 'render');
-  const [isModalOpen, setModalOpen] = useState<boolean>();
+  const [updatedBoardName, setUpdatedBoardName] = useState<string>(board.name);
+  const [isTitleEditActive, setIsTitleEditActive] = useState<boolean>(false);
+  const [newTask, setNewTask] = useState<string>('');
+  const [isNewTaskActive, setIsNewTaskActive] = useState<boolean>(false);
   const setBoards = useSetRecoilState(boardsState);
   const setBoardsOrder = useSetRecoilState(boardsOrderState);
+
+  const onTaskSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    setBoards((prev) => {
+      const newTaskObj = { id: Date.now(), content: newTask };
+      const newTasks = [...prev[`${boardKey}`].tasks, newTaskObj];
+
+      return { ...prev, [`${boardKey}`]: { name: board.name, tasks: newTasks } };
+    });
+    setNewTask('');
+  };
+  const onTaskChanged = (event: React.FormEvent<HTMLInputElement>) => {
+    setNewTask(event.currentTarget.value);
+  };
   const onDelete = () => {
     setBoardsOrder((prev) => {
       const newOrder = [...prev];
@@ -47,37 +65,55 @@ function Board({ board, boardKey, index }: Iprops) {
       return newBoards;
     });
   };
-  const onEdit = () => {};
+  const onEditChange = (event: React.FormEvent<HTMLInputElement>) => {
+    setUpdatedBoardName(event.currentTarget.value);
+  };
+  const onEdit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setBoards((prev) => {
+      let copyBoard = { ...prev[`${boardKey}`] };
+      copyBoard['name'] = updatedBoardName;
+      console.log(copyBoard);
+      return { ...prev, [`${boardKey}`]: copyBoard };
+    });
+    setIsTitleEditActive(false);
+  };
   return (
     <Draggable draggableId={boardKey} index={index}>
       {(provided) => (
         <Container {...provided.dragHandleProps} {...provided.draggableProps} ref={provided.innerRef}>
           <Header>
-            <Title>{board.name}</Title>
-            <button onClick={() => setModalOpen((prev) => !prev)}>
-              <FontAwesomeIcon icon={faEllipsis} />
+            {isTitleEditActive ? (
+              <form onSubmit={onEdit}>
+                <input onChange={onEditChange} type="text" value={updatedBoardName} />
+              </form>
+            ) : (
+              <Title onClick={() => setIsTitleEditActive(true)}>{board.name}</Title>
+            )}
+
+            <button onClick={onDelete}>
+              <FontAwesomeIcon icon={faTrashCan} /> 삭제
             </button>
-            {isModalOpen ? (
-              <Modal>
-                <button onClick={onDelete}>
-                  <FontAwesomeIcon icon={faTrashCan} /> 삭제
-                </button>
-                <button onClick={onEdit}>
-                  <FontAwesomeIcon icon={faPenToSquare} /> 이름 바꾸기
-                </button>
-              </Modal>
-            ) : null}
           </Header>
           <Droppable droppableId={boardKey}>
             {(provided, snapshot) => (
               <TaskList ref={provided.innerRef} {...provided.droppableProps} isDraggingOver={snapshot.isDraggingOver}>
                 {board?.tasks?.map((task, idx) => (
-                  <Task task={task} idx={idx} key={task.id} />
+                  <Task boardKey={boardKey} task={task} idx={idx} key={task.id} />
                 ))}
                 {provided.placeholder}
               </TaskList>
             )}
           </Droppable>
+          {isNewTaskActive ? (
+            <form onSubmit={onTaskSubmit}>
+              <input type="text" onChange={onTaskChanged} value={newTask} placeholder="이름을 입력하세요." />
+              <input type="submit" value="할 일 추가" />
+              <button onClick={() => setIsNewTaskActive(false)}>x</button>
+            </form>
+          ) : (
+            <button onClick={() => setIsNewTaskActive(true)}>+ 새로 만들기</button>
+          )}
         </Container>
       )}
     </Draggable>
