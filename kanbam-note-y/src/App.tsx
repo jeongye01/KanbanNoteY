@@ -1,5 +1,5 @@
 import React from 'react';
-import Home from './Home';
+import Home from './Pages/Home';
 import { RecoilRoot } from 'recoil';
 import GlobalStyle, { theme } from './Styles';
 import { ThemeProvider } from 'styled-components';
