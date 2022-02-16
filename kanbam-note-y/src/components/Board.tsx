@@ -1,8 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Droppable, Draggable } from 'react-beautiful-dnd';
 import styled from 'styled-components';
-import { IboardInfo, Itask } from '../atoms';
+import { faEllipsis, faPenToSquare, faTrashCan } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { boardsOrderState, boardsState, IboardInfo, Itask } from '../atoms';
 import Task from './Task';
+import { useSetRecoilState } from 'recoil';
 const Container = styled.div`
   margin: 8px;
   border: 1px solid lightgrey;
@@ -20,6 +23,8 @@ const TaskList = styled.ul<{ isDraggingOver: boolean }>`
   width: 275px;
   min-height: 100px;
 `;
+const Header = styled.header``;
+const Modal = styled.div``;
 interface Iprops {
   boardKey: string;
   board: IboardInfo;
@@ -27,11 +32,42 @@ interface Iprops {
 }
 function Board({ board, boardKey, index }: Iprops) {
   console.log(boardKey, 'render');
+  const [isModalOpen, setModalOpen] = useState<boolean>();
+  const setBoards = useSetRecoilState(boardsState);
+  const setBoardsOrder = useSetRecoilState(boardsOrderState);
+  const onDelete = () => {
+    setBoardsOrder((prev) => {
+      const newOrder = [...prev];
+      newOrder.splice(index, 1);
+      return newOrder;
+    });
+    setBoards((prev) => {
+      const newBoards = { ...prev };
+      delete newBoards[`${boardKey}`];
+      return newBoards;
+    });
+  };
+  const onEdit = () => {};
   return (
     <Draggable draggableId={boardKey} index={index}>
       {(provided) => (
         <Container {...provided.dragHandleProps} {...provided.draggableProps} ref={provided.innerRef}>
-          <Title>{board.name}</Title>
+          <Header>
+            <Title>{board.name}</Title>
+            <button onClick={() => setModalOpen((prev) => !prev)}>
+              <FontAwesomeIcon icon={faEllipsis} />
+            </button>
+            {isModalOpen ? (
+              <Modal>
+                <button onClick={onDelete}>
+                  <FontAwesomeIcon icon={faTrashCan} /> 삭제
+                </button>
+                <button onClick={onEdit}>
+                  <FontAwesomeIcon icon={faPenToSquare} /> 이름 바꾸기
+                </button>
+              </Modal>
+            ) : null}
+          </Header>
           <Droppable droppableId={boardKey}>
             {(provided, snapshot) => (
               <TaskList ref={provided.innerRef} {...provided.droppableProps} isDraggingOver={snapshot.isDraggingOver}>
