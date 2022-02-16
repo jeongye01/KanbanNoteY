@@ -1,5 +1,5 @@
 import React from 'react';
-import { Droppable } from 'react-beautiful-dnd';
+import { Droppable, Draggable } from 'react-beautiful-dnd';
 import styled from 'styled-components';
 import { Itask } from '../atoms';
 import Task from './Task';
@@ -24,23 +24,28 @@ const TaskList = styled.ul<{ isDraggingOver: boolean }>`
 interface Iprops {
   boardKey: string;
   board: Itask[];
+  index: number;
 }
-function Board({ board, boardKey }: Iprops) {
+function Board({ board, boardKey, index }: Iprops) {
   console.log(boardKey, 'render');
   return (
-    <Container>
-      <Title>{boardKey}</Title>
-      <Droppable droppableId={boardKey}>
-        {(provided, snapshot) => (
-          <TaskList ref={provided.innerRef} {...provided.droppableProps} isDraggingOver={snapshot.isDraggingOver}>
-            {board.map((task, idx) => (
-              <Task task={task} idx={idx} key={task.id} />
-            ))}
-            {provided.placeholder}
-          </TaskList>
-        )}
-      </Droppable>
-    </Container>
+    <Draggable draggableId={boardKey} index={index}>
+      {(provided) => (
+        <Container {...provided.dragHandleProps} {...provided.draggableProps} ref={provided.innerRef}>
+          <Title>{boardKey}</Title>
+          <Droppable droppableId={boardKey}>
+            {(provided, snapshot) => (
+              <TaskList ref={provided.innerRef} {...provided.droppableProps} isDraggingOver={snapshot.isDraggingOver}>
+                {board.map((task, idx) => (
+                  <Task task={task} idx={idx} key={task.id} />
+                ))}
+                {provided.placeholder}
+              </TaskList>
+            )}
+          </Droppable>
+        </Container>
+      )}
+    </Draggable>
   );
 }
 

@@ -16,12 +16,21 @@ function Home() {
   const [boardsOrder, setBoardsOrder] = useRecoilState(boardsOrderState);
   console.log(boardsOrder);
   const onDragEnd = (result: DropResult) => {
-    const { destination, draggableId, source } = result;
+    const { destination, draggableId, source, type } = result;
     console.log(destination, source);
     if (!destination) return;
     if (destination.droppableId === source.droppableId && destination.index === source.index) {
       return;
     }
+    if (type === 'column') {
+      const newOrder = Array.from(boardsOrder);
+      newOrder.splice(source.index, 1);
+      newOrder.splice(destination.index, 0, draggableId);
+
+      setBoardsOrder(newOrder);
+      return;
+    }
+
     const sourceBoard = [...boards[source.droppableId]];
     const taskObj = sourceBoard[source.index];
     sourceBoard.splice(source.index, 1);
@@ -40,22 +49,23 @@ function Home() {
     }
   };
   return (
-    <DragDropContext onDragEnd={onDragEnd}>
-      <Container>
-        {boardsOrder?.map((board, idx) => (
-          <Droppable droppableId={`${board}-container`}>
-            {(provided) => (
-              <div ref={provided.innerRef} {...provided.droppableProps}>
-                <Draggable index={idx} draggableId={`${board}-container`}>
-                  {(provided) => <Board board={boards[board]} key={board} boardKey={board} />}
-                </Draggable>
-                {provided.placeholder}
-              </div>
-            )}
-          </Droppable>
-        ))}
-      </Container>
-    </DragDropContext>
+    <>
+      <DragDropContext onDragEnd={onDragEnd}>
+        <Droppable droppableId="all-boards" direction="horizontal" type="column">
+          {(provided) => (
+            <Container {...provided.droppableProps} ref={provided.innerRef}>
+              {boardsOrder?.map((board, index) => (
+                <Board board={boards[board]} key={board} boardKey={board} index={index} />
+              ))}
+              {provided.placeholder}
+            </Container>
+          )}
+        </Droppable>
+      </DragDropContext>
+      <form>
+        <input placeholder="Add another list" />
+      </form>
+    </>
   );
 }
 
