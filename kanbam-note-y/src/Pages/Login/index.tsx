@@ -1,18 +1,22 @@
 import styled from 'styled-components';
 import { useState, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import { Container, Wrapper, Logo, Form, Error } from '../SignUp/styles';
 import { useForm, SubmitHandler } from 'react-hook-form';
-import { userLogin } from '../../firebase';
+import { userLogin, db, user } from '../../firebase';
 import { onAuthStateChanged } from 'firebase/auth';
-
+import { doc, getDoc } from 'firebase/firestore';
+import { useSetRecoilState } from 'recoil';
+import { userState } from '../../atoms';
 interface IFormInputs {
   email: string;
   password: string;
 }
 
 function Login() {
+  const history = useHistory();
   const [fail, setFail] = useState(false);
+  const setUser = useSetRecoilState(userState);
   const {
     register,
     formState: { errors },
@@ -50,6 +54,7 @@ function Login() {
             placeholder="비밀번호"
             onClick={() => clearErrors('password')}
           />
+          {fail ? <Error>알수 없는 오류가 발생했습니다.</Error> : null}
           <button>로그인</button>
           <div>
             <Link to={'/signup'}>회원가입</Link>

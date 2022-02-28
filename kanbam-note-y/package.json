@@ -16,6 +16,7 @@
     "@types/react": "^17.0.39",
     "@types/react-dom": "^17.0.11",
     "firebase": "^9.6.7",
+    "gravatar": "^1.8.2",
     "react": "^17.0.2",
     "react-beautiful-dnd": "^13.1.0",
     "react-dom": "^17.0.2",

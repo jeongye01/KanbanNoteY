@@ -2,8 +2,9 @@ import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautif
 import { boardsOrderState, boardsState } from '../atoms';
 import { useRecoilState, useResetRecoilState } from 'recoil';
 import { useState } from 'react';
+import Workspace from '../Layouts/Workspace';
 import styled from 'styled-components';
-import Board from '../Components/Board';
+import Board from './Board';
 
 const Container = styled.div`
   margin: 8px;
@@ -11,7 +12,7 @@ const Container = styled.div`
   display: flex;
 `;
 
-function Home() {
+function Work() {
   const [boards, setBoards] = useRecoilState(boardsState);
   const [boardsOrder, setBoardsOrder] = useRecoilState(boardsOrderState);
   const [newBoardName, setNewBoardName] = useState<string>('');
@@ -91,4 +92,4 @@ function Home() {
   );
 }
 
-export default Home;
+export default Work;

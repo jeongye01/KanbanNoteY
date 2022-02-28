@@ -1,6 +1,8 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from 'firebase/auth';
 import { doc, setDoc, getDoc, getFirestore } from 'firebase/firestore';
+import { useSetRecoilState } from 'recoil';
+import { userState } from './atoms';
 
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_apiKey,
@@ -41,12 +43,15 @@ export const createUser = (name: string, email: string, password: string) => {
 
 export const userLogin = (email: string, password: string) => {
   signInWithEmailAndPassword(auth, email, password)
-    .then((userCredential) => {
-      // Signed in
-      const user = userCredential.user;
-      console.log('login sucess');
+    .then(
+      (userCredential) => {
+        // Signed in
+        const user = userCredential.user;
+
+        console.log('login sucess');
+      },
       // ...
-    })
+    )
     .catch((error) => {
       const errorCode = error.code;
       const errorMessage = error.message;
