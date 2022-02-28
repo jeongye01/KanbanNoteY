@@ -22,6 +22,6 @@ const GlobalStyle = createGlobalStyle`
 export const theme: DefaultTheme = {
   bgColor: '#FAFAFA',
   textColor: 'black',
-  accentColor: '#fbc531',
+  accentColor: '#93D42E',
 };
 export default GlobalStyle;

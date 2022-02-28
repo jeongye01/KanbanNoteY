@@ -1,19 +1,19 @@
-import React from 'react';
-import Home from './Pages/Home';
+import React, { FC } from 'react';
+import Router from './Router';
 import { RecoilRoot } from 'recoil';
 import GlobalStyle, { theme } from './Styles';
 import { ThemeProvider } from 'styled-components';
-function App() {
+const App: FC = () => {
   return (
     <>
       <RecoilRoot>
         <ThemeProvider theme={theme}>
           <GlobalStyle />
-          <Home />
+          <Router />
         </ThemeProvider>
       </RecoilRoot>
     </>
   );
-}
+};
 
 export default App;
