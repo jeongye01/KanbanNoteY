@@ -44,16 +44,16 @@ export const Form = styled.form`
       border-color: ${(props) => props.theme.accentColor};
     }
   }
-  p {
-    font-size: 12px;
-    color: red;
-  }
+
   a {
     margin: 1rem 0;
     text-decoration: none;
   }
 `;
-
+export const Error = styled.p`
+  font-size: 12px;
+  color: red;
+`;
 export const Submit = styled.input`
   padding: 1rem;
   color: #fff;

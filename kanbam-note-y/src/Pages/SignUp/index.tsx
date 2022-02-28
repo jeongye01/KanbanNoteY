@@ -1,12 +1,10 @@
-import { useEffect, useState, useRef } from 'react';
+import { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Container, Wrapper, Logo, Form, Submit } from './styles';
+import { Container, Wrapper, Logo, Form, Submit, Error } from './styles';
 import { useForm, SubmitHandler } from 'react-hook-form';
-import { db, createUser, userExist } from '../../firebase';
-import { onAuthStateChanged } from 'firebase/auth';
+import { db, createUser } from '../../firebase';
 import { useHistory } from 'react-router-dom';
-import { useSetRecoilState } from 'recoil';
-import { doc, setDoc, getDoc, getFirestore } from 'firebase/firestore';
+import { doc, getDoc } from 'firebase/firestore';
 interface IFormInputs {
   name: string;
   email: string;
@@ -37,16 +35,6 @@ function Signup() {
       history.push('/');
     }
     createUser(name, email, password);
-    /*onAuthStateChanged(auth, (user) => {
-      if (user) {
-        console.log(user);
-        if (user.email === email) {
-          history.push('/');
-        } else {
-          setFail(true);
-        }
-      }
-    });*/
   };
   return (
     <Container>
@@ -55,14 +43,14 @@ function Signup() {
         <Form onSubmit={handleSubmit(onSubmit)}>
           <h1>회원가입</h1>
 
-          {errors.name && <p>{errors.name.message}</p>}
+          {errors.name && <Error>{errors.name.message}</Error>}
           <input
             {...register('name', { required: '이름을 입력해 주세요' })}
             type="name"
             placeholder="이름"
             onClick={() => clearErrors('name')}
           />
-          {errors.email && <p>{errors.email.message}</p>}
+          {errors.email && <Error>{errors.email.message}</Error>}
           <input
             {...register('email', { required: '이메일을 입력해 주세요' })}
             type="email"
@@ -73,7 +61,7 @@ function Signup() {
             }}
           />
 
-          {errors.password && <p>{errors.password.message}</p>}
+          {errors.password && <Error>{errors.password.message}</Error>}
           <input
             {...register('password', {
               required: '비밀번호를 입력해 주세요.',
@@ -87,7 +75,7 @@ function Signup() {
             onClick={() => clearErrors('password')}
           />
 
-          {errors.password_check && <p>{errors.password_check.message}</p>}
+          {errors.password_check && <Error>{errors.password_check.message}</Error>}
           <input
             {...register('password_check', {
               required: '비밀번호를 입력해 주세요.',
@@ -97,7 +85,7 @@ function Signup() {
             placeholder="비밀번호 확인"
             onClick={() => clearErrors('password_check')}
           />
-          {fail ? <p>이미 존재하는 이메일 입니다.</p> : null}
+          {fail ? <Error>이미 존재하는 이메일 입니다.</Error> : null}
           <Submit type="submit" value="가입 하기" />
           <div>
             <Link to={'/login'}>로그인</Link>

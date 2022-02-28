@@ -33,3 +33,17 @@ export const boardsOrderState = atom<string[]>({
   key: 'boardsOrder',
   default: ['ToDo', 'Doing', 'Done'],
 });
+
+export interface Iuser {
+  name?: string;
+  email: string;
+  uid: string;
+}
+export const userState = atom<Iuser>({
+  key: 'user',
+  default: {
+    uid: '',
+    name: '',
+    email: '',
+  },
+});

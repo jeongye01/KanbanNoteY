@@ -1,19 +1,55 @@
 import styled from 'styled-components';
+import { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Container, Wrapper, Logo, Form } from '../SignUp/styles';
+import { Container, Wrapper, Logo, Form, Error } from '../SignUp/styles';
+import { useForm, SubmitHandler } from 'react-hook-form';
+import { userLogin } from '../../firebase';
+import { onAuthStateChanged } from 'firebase/auth';
+
+interface IFormInputs {
+  email: string;
+  password: string;
+}
 
 function Login() {
+  const [fail, setFail] = useState(false);
+  const {
+    register,
+    formState: { errors },
+    handleSubmit,
+    clearErrors,
+  } = useForm<IFormInputs>();
+  const onSubmit: SubmitHandler<IFormInputs> = async (data) => {
+    console.log(data);
+    const { email, password } = data;
+    userLogin(email, password);
+  };
   return (
     <Container>
       <Wrapper>
         <Logo to={'#'}>yanban✅</Logo>
-        <Form>
+        <Form onSubmit={handleSubmit(onSubmit)}>
           <h1>로그인</h1>
+          {errors.email && <Error>{errors.email.message}</Error>}
           <span>이메일</span>
-          <input type="email" placeholder="이메일" required />
+          <input
+            {...register('email', { required: '이메일을 입력해 주세요' })}
+            type="email"
+            placeholder="이메일"
+            onClick={() => {
+              clearErrors('email');
+            }}
+          />
           <span>비밀번호</span>
-          <input type="password" placeholder="비밀번호" required />
-
+          {errors.password && <Error>{errors.password.message}</Error>}
+          <input
+            {...register('password', {
+              required: '비밀번호를 입력해 주세요.',
+            })}
+            type="password"
+            placeholder="비밀번호"
+            onClick={() => clearErrors('password')}
+          />
           <button>로그인</button>
           <div>
             <Link to={'/signup'}>회원가입</Link>

@@ -1,8 +1,6 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from 'firebase/auth';
-import { getDatabase } from 'firebase/database';
 import { doc, setDoc, getDoc, getFirestore } from 'firebase/firestore';
-import { useHistory } from 'react-router-dom';
 
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_apiKey,
@@ -21,6 +19,7 @@ export const db = getFirestore();
 
 //Auth
 export const auth = getAuth();
+export const user = auth.currentUser;
 export const createUser = (name: string, email: string, password: string) => {
   createUserWithEmailAndPassword(auth, email, password)
     .then(async (userCredential) => {
@@ -40,20 +39,12 @@ export const createUser = (name: string, email: string, password: string) => {
     });
 };
 
-export const userExist = async (uid: string) => {
-  const docRef = doc(db, 'users', uid);
-  const docSnap = await getDoc(docRef);
-  if (docSnap.exists()) {
-    console.log(docSnap.data());
-  } else {
-  }
-};
-
 export const userLogin = (email: string, password: string) => {
   signInWithEmailAndPassword(auth, email, password)
     .then((userCredential) => {
       // Signed in
       const user = userCredential.user;
+      console.log('login sucess');
       // ...
     })
     .catch((error) => {
