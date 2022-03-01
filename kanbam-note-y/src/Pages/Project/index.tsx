@@ -1,10 +1,10 @@
 import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd';
-import { boardsOrderState, boardsState } from '../atoms';
+import { boardsOrderState, boardsState } from '../../atoms';
 import { useRecoilState, useResetRecoilState } from 'recoil';
 import { useState } from 'react';
-import Workspace from '../Layouts/Workspace';
+import Workspace from '../../Layouts/Workspace';
 import styled from 'styled-components';
-import Board from './Board';
+import Board from '../../Components/Board';
 
 const Container = styled.div`
   margin: 8px;

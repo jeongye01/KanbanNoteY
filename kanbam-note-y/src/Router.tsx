@@ -33,7 +33,7 @@ function Router() {
   return (
     <BrowserRouter>
       <Switch>
-        <Route exact path="/">
+        <Route exact path={['/', '/project/:projectId']}>
           {loggedIn ? <Workspace /> : <Login />}
         </Route>
 
