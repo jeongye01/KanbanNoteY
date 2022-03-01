@@ -28,13 +28,13 @@ function Task({ boardKey, task, idx }: Iprops) {
     event.preventDefault();
 
     setBoards((prev) => {
-      const copyBoard = { ...prev[boardKey] };
+      const copyBoard = { ...prev.contents[boardKey] };
       const copyTasks = [...copyBoard.tasks];
       const { id } = copyTasks[idx];
       copyTasks.splice(idx, 0, { id, content: updatedTaskName });
       copyTasks.splice(idx + 1, 1);
 
-      return { ...prev, [`${boardKey}`]: { name: copyBoard.name, tasks: copyTasks } };
+      return { ...prev, contents: { ...prev.contents, [`${boardKey}`]: { name: copyBoard.name, tasks: copyTasks } } };
     });
     setIsEditActive(false);
   };
@@ -44,12 +44,12 @@ function Task({ boardKey, task, idx }: Iprops) {
 
   const onTaskDelete = () => {
     setBoards((prev) => {
-      const copyBoard = { ...prev[boardKey] };
+      const copyBoard = { ...prev.contents[boardKey] };
       const copyTasks = [...copyBoard.tasks];
 
       copyTasks.splice(idx, 1);
 
-      return { ...prev, [`${boardKey}`]: { name: copyBoard.name, tasks: copyTasks } };
+      return { ...prev, contents: { ...prev.contents, [`${boardKey}`]: { name: copyBoard.name, tasks: copyTasks } } };
     });
   };
   return (

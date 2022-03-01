@@ -9,29 +9,43 @@ export interface IboardInfo {
   tasks: Itask[];
 }
 export interface IboardsState {
-  [key: string]: IboardInfo;
+  userId: string;
+  contents: {
+    [key: string]: IboardInfo;
+  };
+}
+
+export interface IboardsOrderState {
+  userId: string;
+  order: string[];
 }
 
 export const boardsState = atom<IboardsState>({
   key: 'boards',
   default: {
-    ToDo: {
-      name: 'ToDo',
-      tasks: [],
-    },
+    userId: '',
+    contents: {
+      ToDo: {
+        name: 'ToDo',
+        tasks: [],
+      },
 
-    Doing: {
-      name: 'Doing',
-      tasks: [],
-    },
+      Doing: {
+        name: 'Doing',
+        tasks: [],
+      },
 
-    Done: { name: 'Done', tasks: [] },
+      Done: { name: 'Done', tasks: [] },
+    },
   },
 });
 
-export const boardsOrderState = atom<string[]>({
+export const boardsOrderState = atom<IboardsOrderState>({
   key: 'boardsOrder',
-  default: ['ToDo', 'Doing', 'Done'],
+  default: {
+    userId: '',
+    order: ['ToDo', 'Doing', 'Done'],
+  },
 });
 
 export interface Iuser {

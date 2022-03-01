@@ -2,19 +2,11 @@ import { CreateModal, CloseModalButton } from './styles';
 
 import React, { useCallback } from 'react';
 
-const Modal = ({ show, children, onCloseModal }) => {
-  const stopPropagation = useCallback((e) => {
-    e.stopPropagation();
-  }, []);
-
-  if (!show) {
-    return null;
-  }
+const Modal = () => {
   return (
-    <CreateModal onClick={onCloseModal}>
-      <div onClick={stopPropagation}>
-        <CloseModalButton onClick={onCloseModal}>&times;</CloseModalButton>
-        {children}
+    <CreateModal>
+      <div>
+        <CloseModalButton>&times;</CloseModalButton>
       </div>
     </CreateModal>
   );

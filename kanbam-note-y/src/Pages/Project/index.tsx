@@ -23,13 +23,16 @@ function Work() {
 
     setBoards((allBoards) => {
       console.log(id);
-      const updatedBoards = { ...allBoards, [`${id}`]: { name: newBoardName, tasks: [] } };
+      const contents = allBoards.contents;
+      const updatedContents = { ...contents, [`${id}`]: { name: newBoardName, tasks: [] } };
 
-      return updatedBoards;
+      return { ...allBoards, contents: updatedContents };
     });
     setBoardsOrder((allBoards) => {
       console.log(id);
-      return [...allBoards, id.toString()];
+      const order = allBoards.order;
+      const updatedOrder = [...order, id.toString()];
+      return { ...allBoards, order: updatedOrder };
     });
   };
   const onNewBoardChange = (event: React.FormEvent<HTMLInputElement>) => {
@@ -43,30 +46,36 @@ function Work() {
       return;
     }
     if (type === 'column') {
-      const newOrder = Array.from(boardsOrder);
+      const newOrder = Array.from(boardsOrder.order);
       newOrder.splice(source.index, 1);
       newOrder.splice(destination.index, 0, draggableId);
 
-      setBoardsOrder(newOrder);
+      setBoardsOrder((prev) => ({ ...prev, order: newOrder }));
       return;
     }
 
-    const sourceTasksCopy = [...boards[source.droppableId].tasks];
+    const sourceTasksCopy = [...boards.contents[source.droppableId].tasks];
     const taskObj = sourceTasksCopy[source.index];
-    const sourceName = boards[source.droppableId].name;
+    const sourceName = boards.contents[source.droppableId].name;
     sourceTasksCopy.splice(source.index, 1);
     if (destination.droppableId === source.droppableId) {
       sourceTasksCopy.splice(destination.index, 0, taskObj);
-      setBoards((prev) => ({ ...prev, [source.droppableId]: { name: sourceName, tasks: sourceTasksCopy } }));
+      setBoards((prev) => ({
+        ...prev,
+        contents: { ...prev.contents, [source.droppableId]: { name: sourceName, tasks: sourceTasksCopy } },
+      }));
     }
     if (destination.droppableId !== source.droppableId) {
-      const destinationTasksCopy = [...boards[destination.droppableId].tasks];
-      const destinationName = boards[destination.droppableId].name;
+      const destinationTasksCopy = [...boards.contents[destination.droppableId].tasks];
+      const destinationName = boards.contents[destination.droppableId].name;
       destinationTasksCopy.splice(destination.index, 0, taskObj);
       setBoards((prev) => ({
         ...prev,
-        [source.droppableId]: { name: sourceName, tasks: sourceTasksCopy },
-        [destination.droppableId]: { name: destinationName, tasks: destinationTasksCopy },
+        contents: {
+          ...prev.contents,
+          [source.droppableId]: { name: sourceName, tasks: sourceTasksCopy },
+          [destination.droppableId]: { name: destinationName, tasks: destinationTasksCopy },
+        },
       }));
     }
   };
@@ -76,8 +85,8 @@ function Work() {
         <Droppable droppableId="all-boards" direction="horizontal" type="column">
           {(provided) => (
             <Container {...provided.droppableProps} ref={provided.innerRef}>
-              {boardsOrder?.map((boardId, index) => (
-                <Board board={boards[boardId]} key={boardId} boardKey={boardId} index={index} />
+              {boardsOrder.order?.map((boardId, index) => (
+                <Board board={boards.contents[boardId]} key={boardId} boardKey={boardId} index={index} />
               ))}
               {provided.placeholder}
             </Container>

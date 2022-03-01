@@ -44,9 +44,9 @@ function Board({ board, boardKey, index }: Iprops) {
 
     setBoards((prev) => {
       const newTaskObj = { id: Date.now(), content: newTask };
-      const newTasks = [...prev[`${boardKey}`].tasks, newTaskObj];
+      const newTasks = [...prev.contents[`${boardKey}`].tasks, newTaskObj];
 
-      return { ...prev, [`${boardKey}`]: { name: board.name, tasks: newTasks } };
+      return { ...prev, contents: { ...prev.contents, [`${boardKey}`]: { name: board.name, tasks: newTasks } } };
     });
     setNewTask('');
   };
@@ -55,14 +55,14 @@ function Board({ board, boardKey, index }: Iprops) {
   };
   const onDelete = () => {
     setBoardsOrder((prev) => {
-      const newOrder = [...prev];
+      const newOrder = [...prev.order];
       newOrder.splice(index, 1);
-      return newOrder;
+      return { ...prev, order: newOrder };
     });
     setBoards((prev) => {
-      const newBoards = { ...prev };
+      const newBoards = { ...prev.contents };
       delete newBoards[`${boardKey}`];
-      return newBoards;
+      return { ...prev, contents: newBoards };
     });
   };
   const onEditChange = (event: React.FormEvent<HTMLInputElement>) => {
@@ -71,10 +71,10 @@ function Board({ board, boardKey, index }: Iprops) {
   const onEdit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setBoards((prev) => {
-      let copyBoard = { ...prev[`${boardKey}`] };
+      let copyBoard = { ...prev.contents[`${boardKey}`] };
       copyBoard['name'] = updatedBoardName;
       console.log(copyBoard);
-      return { ...prev, [`${boardKey}`]: copyBoard };
+      return { ...prev, contents: { ...prev.contents, [`${boardKey}`]: copyBoard } };
     });
     setIsTitleEditActive(false);
   };

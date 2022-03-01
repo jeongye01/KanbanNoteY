@@ -1,7 +1,16 @@
 import { CreateMenu, CloseModalButton } from './styles';
 import React, { useCallback } from 'react';
+import { CSSProperties } from 'styled-components';
 
-const Menu = () => {
+interface Props {
+  show: boolean;
+  onCloseModal: () => void;
+  style: CSSProperties;
+  closeButton?: boolean;
+  children: React.ReactNode;
+}
+
+const Menu = ({ closeButton, style, show, children, onCloseModal }: Props) => {
   const stopPropagation = useCallback((e) => {
     e.stopPropagation();
   }, []);
@@ -10,16 +19,13 @@ const Menu = () => {
     return null;
   }
   return (
-    <CreateMenu>
-      <div onClick={stopPropagation}>
+    <CreateMenu onClick={onCloseModal}>
+      <div onClick={stopPropagation} style={style}>
         {closeButton && <CloseModalButton onClick={onCloseModal}>&times;</CloseModalButton>}
         {children}
       </div>
     </CreateMenu>
   );
-};
-Menu.defaultProps = {
-  closeButton: true,
 };
 
 export default Menu;

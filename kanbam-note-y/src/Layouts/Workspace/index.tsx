@@ -33,9 +33,21 @@ const Workspace = () => {
       <Header>
         {true && (
           <RightMenu>
-            <ProfileImg src={gravatar.url(user.email, { s: '28px', d: 'retro' })} alt={user.name} />
+            <span
+              onClick={() => {
+                setShowUserMenu((prev) => !prev);
+              }}
+            >
+              <ProfileImg src={gravatar.url(user.email, { s: '28px', d: 'retro' })} alt={user.name} />
+            </span>
             {showUserMenu && (
-              <Menu style={{ right: 0, top: 38 }} show={showUserMenu} onCloseModal={() => setShowUserMenu(false)}>
+              <Menu
+                style={{ right: 0, top: 38 }}
+                show={showUserMenu}
+                onCloseModal={() => {
+                  setShowUserMenu((prev) => !prev);
+                }}
+              >
                 <ProfileModal>
                   <img src={gravatar.url(user.email, { s: '36px', d: 'retro' })} alt={user.name} />
                   <div>
