@@ -3,10 +3,12 @@ import { useParams } from 'react-router';
 import { Link, Redirect, Route, Switch } from 'react-router-dom';
 import gravatar from 'gravatar';
 import { useRecoilValue } from 'recoil';
-import { userState } from '../../atoms';
-import Work from '../../Pages/Project';
+import { userState } from '../../Atoms/user';
+import Project from '../../Pages/Project';
 import Menu from '../../Components/Menu';
 import Modal from '../../Components/Modal';
+import ProjectList from '../../Components/ProjectList';
+import AddProjectModal from '../../Components/AddProjectModal';
 import {
   AddButton,
   Channels,
@@ -14,6 +16,7 @@ import {
   Header,
   LogOutButton,
   MenuScroll,
+  AddProject,
   ProfileImg,
   ProfileModal,
   RightMenu,
@@ -27,7 +30,7 @@ import {
 const Workspace = () => {
   const user = useRecoilValue(userState);
   const [showUserMenu, setShowUserMenu] = useState(false);
-
+  const [showAddProjectModal, setShowAddProjectModal] = useState(false);
   return (
     <div>
       <Header>
@@ -64,10 +67,27 @@ const Workspace = () => {
       <WorkspaceWrapper>
         <Channels>
           <WorkspaceName>Yanban</WorkspaceName>
-          <MenuScroll>menu scroll</MenuScroll>
+          <MenuScroll>
+            <AddProject>
+              <span>Your Projects</span>
+              <button onClick={() => setShowAddProjectModal((prev) => !prev)}>+</button>
+            </AddProject>
+            <ProjectList />
+            {showAddProjectModal && (
+              <Menu
+                style={{ left: 260, top: 105 }}
+                show={showAddProjectModal}
+                onCloseModal={() => {
+                  setShowAddProjectModal((prev) => !prev);
+                }}
+              >
+                lalaval
+              </Menu>
+            )}
+          </MenuScroll>
         </Channels>
         <Chats>
-          <Work />
+          <Project />
         </Chats>
       </WorkspaceWrapper>
     </div>
@@ -75,3 +95,13 @@ const Workspace = () => {
 };
 
 export default Workspace;
+/*
+
+<CreateChannelModal
+        show={showCreateChannelModal}
+        onCloseModal={() => {
+          setShowCreateChannelModal(false);
+        }}
+        setShowCreateChannelModal={setShowCreateChannelModal}
+      />
+*/

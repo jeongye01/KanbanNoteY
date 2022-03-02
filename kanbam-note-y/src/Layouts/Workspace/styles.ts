@@ -153,7 +153,11 @@ export const MenuScroll = styled.div`
   height: calc(100vh - 102px);
   overflow-y: auto;
 `;
-
+export const AddProject = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
 export const WorkspaceModal = styled.div`
   padding: 10px 0 0;
 

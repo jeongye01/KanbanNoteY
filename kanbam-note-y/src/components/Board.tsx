@@ -3,9 +3,13 @@ import { Droppable, Draggable } from 'react-beautiful-dnd';
 import styled from 'styled-components';
 import { faEllipsis, faPenToSquare, faTrashCan } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { boardsOrderState, boardsState, IboardInfo, Itask } from '../atoms';
+import { boardsOrderState, projectState } from '../Atoms/project';
+import { userState } from '../Atoms/user';
+import { IboardInfo, Itask } from '../Typings/db';
 import Task from './Task';
-import { useSetRecoilState } from 'recoil';
+import { useSetRecoilState, useRecoilState, useRecoilValue } from 'recoil';
+import { doc, setDoc } from 'firebase/firestore';
+import { db } from '../firebase';
 const Container = styled.div`
   margin: 8px;
   border: 1px solid lightgrey;
@@ -36,45 +40,57 @@ function Board({ board, boardKey, index }: Iprops) {
   const [isTitleEditActive, setIsTitleEditActive] = useState<boolean>(false);
   const [newTask, setNewTask] = useState<string>('');
   const [isNewTaskActive, setIsNewTaskActive] = useState<boolean>(false);
-  const setBoards = useSetRecoilState(boardsState);
-  const setBoardsOrder = useSetRecoilState(boardsOrderState);
-
-  const onTaskSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const [project, setProject] = useRecoilState(projectState);
+  const [boardsOrder, setBoardsOrder] = useRecoilState(boardsOrderState);
+  const user = useRecoilValue(userState);
+  const onTaskSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    setBoards((prev) => {
+    setProject((prev) => {
       const newTaskObj = { id: Date.now(), content: newTask };
       const newTasks = [...prev.contents[`${boardKey}`].tasks, newTaskObj];
 
       return { ...prev, contents: { ...prev.contents, [`${boardKey}`]: { name: board.name, tasks: newTasks } } };
+    });
+    await setDoc(doc(db, 'project', project.id), {
+      ...project,
     });
     setNewTask('');
   };
   const onTaskChanged = (event: React.FormEvent<HTMLInputElement>) => {
     setNewTask(event.currentTarget.value);
   };
-  const onDelete = () => {
+  const onDelete = async () => {
     setBoardsOrder((prev) => {
       const newOrder = [...prev.order];
       newOrder.splice(index, 1);
       return { ...prev, order: newOrder };
     });
-    setBoards((prev) => {
+    setProject((prev) => {
       const newBoards = { ...prev.contents };
       delete newBoards[`${boardKey}`];
       return { ...prev, contents: newBoards };
+    });
+    await setDoc(doc(db, 'boardsOrder', project.id), {
+      ...boardsOrder,
+    });
+    await setDoc(doc(db, 'project', project.id), {
+      ...project,
     });
   };
   const onEditChange = (event: React.FormEvent<HTMLInputElement>) => {
     setUpdatedBoardName(event.currentTarget.value);
   };
-  const onEdit = (event: React.FormEvent<HTMLFormElement>) => {
+  const onEdit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setBoards((prev) => {
+    setProject((prev) => {
       let copyBoard = { ...prev.contents[`${boardKey}`] };
       copyBoard['name'] = updatedBoardName;
       console.log(copyBoard);
       return { ...prev, contents: { ...prev.contents, [`${boardKey}`]: copyBoard } };
+    });
+    await setDoc(doc(db, 'project', project.id), {
+      ...project,
     });
     setIsTitleEditActive(false);
   };

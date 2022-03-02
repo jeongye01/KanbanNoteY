@@ -10,7 +10,7 @@ import { auth } from './firebase';
 import { userLogin, db } from './firebase';
 import { doc, getDoc } from 'firebase/firestore';
 import { useSetRecoilState } from 'recoil';
-import { userState } from './atoms';
+import { userState } from './Atoms/user';
 function Router() {
   const [loggedIn, setLoggedIn] = useState<boolean>();
   const setUser = useSetRecoilState(userState);
@@ -21,9 +21,9 @@ function Router() {
       console.log(docSnap.data());
       if (docSnap.exists()) {
         console.log(docSnap.data());
-        const { name, email, uid } = docSnap.data();
+        const { name, email, uid, projectIds } = docSnap.data();
         console.log(name, email, uid);
-        setUser({ name, email, uid });
+        setUser({ name, email, uid, projectIds });
         setLoggedIn(true);
       }
     }

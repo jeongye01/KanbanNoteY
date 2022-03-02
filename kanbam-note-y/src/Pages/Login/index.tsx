@@ -7,7 +7,7 @@ import { userLogin, db, user } from '../../firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 import { useSetRecoilState } from 'recoil';
-import { userState } from '../../atoms';
+import { userState } from '../../Atoms/user';
 interface IFormInputs {
   email: string;
   password: string;

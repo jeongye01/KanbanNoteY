@@ -3,8 +3,12 @@ import { Draggable } from 'react-beautiful-dnd';
 import styled from 'styled-components';
 import { faPenToSquare, faTrashCan } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { boardsOrderState, boardsState, Itask } from '../atoms';
-import { useSetRecoilState } from 'recoil';
+import { boardsOrderState, projectState } from '../Atoms/project';
+import { Itask } from '../Typings/db';
+import { userState } from '../Atoms/user';
+import { useRecoilState, useRecoilValue } from 'recoil';
+import { doc, setDoc } from 'firebase/firestore';
+import { db } from '../firebase';
 const List = styled.li<{ isDragging: boolean }>`
   border: 1px solid lightgrey;
   border-radius: 2px;
@@ -22,12 +26,12 @@ function Task({ boardKey, task, idx }: Iprops) {
   const [updatedTaskName, setUpdatedTaskName] = useState<string>(task.content);
   const [isEditActive, setIsEditActive] = useState<boolean>(false);
 
-  const setBoards = useSetRecoilState(boardsState);
-
-  const onTaskSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const [project, setProject] = useRecoilState(projectState);
+  const user = useRecoilValue(userState);
+  const onTaskSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    setBoards((prev) => {
+    setProject((prev) => {
       const copyBoard = { ...prev.contents[boardKey] };
       const copyTasks = [...copyBoard.tasks];
       const { id } = copyTasks[idx];
@@ -36,20 +40,26 @@ function Task({ boardKey, task, idx }: Iprops) {
 
       return { ...prev, contents: { ...prev.contents, [`${boardKey}`]: { name: copyBoard.name, tasks: copyTasks } } };
     });
+    await setDoc(doc(db, 'project', project.id), {
+      ...project,
+    });
     setIsEditActive(false);
   };
   const onTaskChanged = (event: React.FormEvent<HTMLInputElement>) => {
     setUpdatedTaskName(event.currentTarget.value);
   };
 
-  const onTaskDelete = () => {
-    setBoards((prev) => {
+  const onTaskDelete = async () => {
+    setProject((prev) => {
       const copyBoard = { ...prev.contents[boardKey] };
       const copyTasks = [...copyBoard.tasks];
 
       copyTasks.splice(idx, 1);
 
       return { ...prev, contents: { ...prev.contents, [`${boardKey}`]: { name: copyBoard.name, tasks: copyTasks } } };
+    });
+    await setDoc(doc(db, 'project', project.id), {
+      ...project,
     });
   };
   return (
