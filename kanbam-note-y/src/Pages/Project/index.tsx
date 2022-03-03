@@ -23,7 +23,7 @@ function Project() {
   const [boardsOrder, setBoardsOrder] = useRecoilState(boardsOrderState);
   const [newBoardName, setNewBoardName] = useState<string>('');
   const user = useRecoilValue(userState);
-  console.log(boardsOrder);
+  console.log(boardsOrder, project, 'init');
   const onNewBoardSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const id = Date.now();
@@ -34,27 +34,33 @@ function Project() {
         ...prev,
         contents: { ...prev.contents, [`${id}`]: { name: newBoardName, tasks: [] } },
       };
-      updateProject(project.id, newProject);
+      updateProject(newProject);
       return newProject;
     });
 
     setBoardsOrder((prev) => {
       console.log(id);
       const newBoardsOrder = { ...prev, order: [...prev.order, id.toString()] };
-      updateBoardsOrder(project.id, newBoardsOrder);
+      updateBoardsOrder(newBoardsOrder);
       return newBoardsOrder;
     });
   };
 
-  const updateProject = async (id: string, newProject: IProject) => {
-    await setDoc(doc(db, 'projects', id), {
-      ...newProject,
-    });
+  const updateProject = async (newProject: IProject) => {
+    console.log('update project', projectId);
+    if (projectId) {
+      await setDoc(doc(db, 'projects', projectId), {
+        ...newProject,
+      });
+    }
   };
-  const updateBoardsOrder = async (id: string, newBoardsOrder: IboardsOrder) => {
-    await setDoc(doc(db, 'boardsOrders', id), {
-      ...newBoardsOrder,
-    });
+  const updateBoardsOrder = async (newBoardsOrder: IboardsOrder) => {
+    console.log('update boardsOrder', projectId);
+    if (projectId) {
+      await setDoc(doc(db, 'boardsOrders', projectId), {
+        ...newBoardsOrder,
+      });
+    }
   };
   const onNewBoardChange = (event: React.FormEvent<HTMLInputElement>) => {
     setNewBoardName(event.currentTarget.value);
@@ -73,7 +79,8 @@ function Project() {
 
       setBoardsOrder((prev) => {
         const newBoardsOrder = { ...prev, order: newOrder };
-        updateBoardsOrder(project.id, newBoardsOrder);
+        updateBoardsOrder(newBoardsOrder);
+        console.log(newBoardsOrder, 'newBoardsOrder');
         return newBoardsOrder;
       });
 
@@ -91,7 +98,7 @@ function Project() {
           ...prev,
           contents: { ...prev.contents, [source.droppableId]: { name: sourceName, tasks: sourceTasksCopy } },
         };
-        updateProject(project.id, newProject);
+        updateProject(newProject);
         return newProject;
       });
     }
@@ -108,7 +115,7 @@ function Project() {
             [destination.droppableId]: { name: destinationName, tasks: destinationTasksCopy },
           },
         };
-        updateProject(project.id, newProject);
+        updateProject(newProject);
         return newProject;
       });
     }
@@ -119,20 +126,24 @@ function Project() {
     if (docSnap.exists()) {
       const { id, name, contents } = docSnap.data();
       setProject({ id, name, contents });
+      console.log('project', project);
     }
   };
   const fetchBoardsOrder = async (projectId: string) => {
-    const docRef = doc(db, 'boardsOrder', projectId);
+    const docRef = doc(db, 'boardsOrders', projectId);
+    console.log('order', projectId);
     const docSnap = await getDoc(docRef);
     if (docSnap.exists()) {
+      console.log('왜 안나타나');
       const { projectId, order } = docSnap.data();
+
       setBoardsOrder({ projectId, order });
     }
   };
   useEffect(() => {
     if (projectId) {
-      fetchProject(projectId);
       fetchBoardsOrder(projectId);
+      fetchProject(projectId);
     }
   }, [projectId]);
   return (

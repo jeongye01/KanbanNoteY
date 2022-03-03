@@ -22,11 +22,13 @@ function AddProjectModal() {
   const onSubmit = async (event: React.SyntheticEvent) => {
     event.preventDefault();
     const id = nanoid();
-    setUser((prev) => ({ ...prev, projectIds: [...prev.projectIds, id] }));
+    setUser((prev) => {
+      updateUser(id);
+      createProject(id);
+      createBoardsOrder(id);
+      return { ...prev, projectIds: [...prev.projectIds, id] };
+    });
     console.log('add project', user);
-    updateUser(id);
-    createProject(id);
-    createBoardsOrder(id);
   };
   const onChange = (event: React.FormEvent<HTMLInputElement>) => {
     setNewProject(event.currentTarget.value);
@@ -50,7 +52,7 @@ function AddProjectModal() {
   const createBoardsOrder = async (id: string) => {
     await setDoc(doc(db, 'boardsOrders', id), {
       projectId: id,
-      orders: defaultBoardsOrder,
+      order: defaultBoardsOrder,
     });
   };
   return (
