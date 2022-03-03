@@ -31,7 +31,7 @@ export const createUser = (name: string, email: string, password: string) => {
         name,
         email,
         password,
-        projectsIds: [],
+        projectIds: [],
       });
     })
     .catch((error) => {

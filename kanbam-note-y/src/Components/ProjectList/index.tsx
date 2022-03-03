@@ -20,7 +20,11 @@ function ProjectList() {
 
   return (
     <>
-      <div></div>
+      <div>
+        {user?.projectIds.map((projectId) => (
+          <li key={projectId}>{projectId}</li>
+        ))}
+      </div>
     </>
   );
 }

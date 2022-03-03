@@ -81,7 +81,7 @@ const Workspace = () => {
                   setShowAddProjectModal((prev) => !prev);
                 }}
               >
-                lalaval
+                <AddProjectModal />
               </Menu>
             )}
           </MenuScroll>
