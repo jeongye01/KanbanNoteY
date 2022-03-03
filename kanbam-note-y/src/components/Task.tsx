@@ -28,6 +28,13 @@ function Task({ boardKey, task, idx }: Iprops) {
 
   const [project, setProject] = useRecoilState(projectState);
   const user = useRecoilValue(userState);
+  const updateProject = async (id: string) => {
+    await setDoc(doc(db, 'projects', project.id), {
+      ...project,
+    });
+    console.log('task update', project);
+  };
+
   const onTaskSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
@@ -40,9 +47,7 @@ function Task({ boardKey, task, idx }: Iprops) {
 
       return { ...prev, contents: { ...prev.contents, [`${boardKey}`]: { name: copyBoard.name, tasks: copyTasks } } };
     });
-    await setDoc(doc(db, 'project', project.id), {
-      ...project,
-    });
+    updateProject(project.id);
     setIsEditActive(false);
   };
   const onTaskChanged = (event: React.FormEvent<HTMLInputElement>) => {
@@ -58,9 +63,7 @@ function Task({ boardKey, task, idx }: Iprops) {
 
       return { ...prev, contents: { ...prev.contents, [`${boardKey}`]: { name: copyBoard.name, tasks: copyTasks } } };
     });
-    await setDoc(doc(db, 'project', project.id), {
-      ...project,
-    });
+    updateProject(project.id);
   };
   return (
     <Draggable draggableId={`${task.id}`} index={idx}>

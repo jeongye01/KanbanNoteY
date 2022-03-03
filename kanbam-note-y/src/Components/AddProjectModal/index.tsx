@@ -7,7 +7,7 @@ import { db } from '../../firebase';
 import { userState } from '../../Atoms/user';
 import { doc, setDoc } from 'firebase/firestore';
 import { nanoid } from 'nanoid';
-import { updateCurrentUser } from 'firebase/auth';
+import { defaultProjectContents } from '../../Typings/db';
 
 interface Props {
   show: boolean;
@@ -25,6 +25,7 @@ function AddProjectModal() {
     setUser((prev) => ({ ...prev, projectIds: [...prev.projectIds, id] }));
     console.log('add project', user);
     updateUser(id);
+    createProject(id);
   };
   const onChange = (event: React.FormEvent<HTMLInputElement>) => {
     setNewProject(event.currentTarget.value);
@@ -32,7 +33,19 @@ function AddProjectModal() {
   const updateUser = async (id: string) => {
     await setDoc(doc(db, 'users', user.email), {
       ...user,
-      projectsIds: [...user.projectIds, id],
+      projectIds: [...user.projectIds, id],
+    });
+    console.log('add project', user);
+  };
+  const createProject = async (id: string) => {
+    await setDoc(doc(db, 'projects', id), {
+      id,
+      name: newProject,
+      contents: defaultProjectContents,
+    });
+    await setDoc(doc(db, 'boardsOrders', id), {
+      projectId: id,
+      orders: [Object.keys(defaultProjectContents)],
     });
     console.log('add project', user);
   };

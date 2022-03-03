@@ -43,6 +43,16 @@ function Board({ board, boardKey, index }: Iprops) {
   const [project, setProject] = useRecoilState(projectState);
   const [boardsOrder, setBoardsOrder] = useRecoilState(boardsOrderState);
   const user = useRecoilValue(userState);
+  const updateProject = async (id: string) => {
+    await setDoc(doc(db, 'projects', project.id), {
+      ...project,
+    });
+  };
+  const updateBoardsOrder = async (id: string) => {
+    await setDoc(doc(db, 'boardsOrders', project.id), {
+      ...boardsOrder,
+    });
+  };
   const onTaskSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
@@ -52,9 +62,7 @@ function Board({ board, boardKey, index }: Iprops) {
 
       return { ...prev, contents: { ...prev.contents, [`${boardKey}`]: { name: board.name, tasks: newTasks } } };
     });
-    await setDoc(doc(db, 'project', project.id), {
-      ...project,
-    });
+    updateProject(project.id);
     setNewTask('');
   };
   const onTaskChanged = (event: React.FormEvent<HTMLInputElement>) => {
@@ -71,12 +79,8 @@ function Board({ board, boardKey, index }: Iprops) {
       delete newBoards[`${boardKey}`];
       return { ...prev, contents: newBoards };
     });
-    await setDoc(doc(db, 'boardsOrder', project.id), {
-      ...boardsOrder,
-    });
-    await setDoc(doc(db, 'project', project.id), {
-      ...project,
-    });
+    updateBoardsOrder(project.id);
+    updateProject(project.id);
   };
   const onEditChange = (event: React.FormEvent<HTMLInputElement>) => {
     setUpdatedBoardName(event.currentTarget.value);
@@ -89,9 +93,7 @@ function Board({ board, boardKey, index }: Iprops) {
       console.log(copyBoard);
       return { ...prev, contents: { ...prev.contents, [`${boardKey}`]: copyBoard } };
     });
-    await setDoc(doc(db, 'project', project.id), {
-      ...project,
-    });
+    updateProject(project.id);
     setIsTitleEditActive(false);
   };
   return (

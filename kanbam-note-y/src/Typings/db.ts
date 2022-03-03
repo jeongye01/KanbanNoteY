@@ -25,3 +25,17 @@ export interface IboardsOrder {
   projectId: string;
   order: string[];
 }
+
+export const defaultProjectContents = {
+  ToDo: {
+    name: 'ToDo',
+    tasks: [],
+  },
+
+  Doing: {
+    name: 'Doing',
+    tasks: [],
+  },
+
+  Done: { name: 'Done', tasks: [] },
+};

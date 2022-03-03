@@ -2,10 +2,11 @@
 import EachProject from '../EachProject';
 //import { IChannel, IUser } from '@typings/db';
 //import fetcher from '@utils/fetcher';
-import React, { FC, useCallback, useState } from 'react';
+import React, { FC, useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { userState } from '../../Atoms/user';
+
 import AddProjectModal from '../AddProjectModal';
 //import useSWR from 'swr';
 
@@ -22,7 +23,7 @@ function ProjectList() {
     <>
       <div>
         {user?.projectIds.map((projectId) => (
-          <li key={projectId}>{projectId}</li>
+          <EachProject key={projectId} projectId={projectId} />
         ))}
       </div>
     </>

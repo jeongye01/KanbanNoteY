@@ -31,16 +31,22 @@ function Project() {
         contents: { ...prev.contents, [`${id}`]: { name: newBoardName, tasks: [] } },
       };
     });
-    await setDoc(doc(db, 'project', project.id), {
-      ...project,
-    });
+    updateProject(id.toString());
     setBoardsOrder((prev) => {
       console.log(id);
       const order = prev.order;
 
       return { ...prev, order: [...prev.order, id.toString()] };
     });
-    await setDoc(doc(db, 'boardsOrder', project.id), {
+    updateBoardsOrder(id.toString());
+  };
+  const updateProject = async (id: string) => {
+    await setDoc(doc(db, 'projects', project.id), {
+      ...project,
+    });
+  };
+  const updateBoardsOrder = async (id: string) => {
+    await setDoc(doc(db, 'boardsOrders', project.id), {
       ...boardsOrder,
     });
   };
@@ -60,9 +66,7 @@ function Project() {
       newOrder.splice(destination.index, 0, draggableId);
 
       setBoardsOrder((prev) => ({ ...prev, order: newOrder }));
-      await setDoc(doc(db, 'boardsOrder', project.id), {
-        ...boardsOrder,
-      });
+      updateBoardsOrder(project.id);
       return;
     }
 
@@ -76,9 +80,7 @@ function Project() {
         ...prev,
         contents: { ...prev.contents, [source.droppableId]: { name: sourceName, tasks: sourceTasksCopy } },
       }));
-      await setDoc(doc(db, 'project', project.id), {
-        ...project,
-      });
+      updateProject(project.id);
     }
     if (destination.droppableId !== source.droppableId) {
       const destinationTasksCopy = [...project.contents[destination.droppableId].tasks];
@@ -92,9 +94,7 @@ function Project() {
           [destination.droppableId]: { name: destinationName, tasks: destinationTasksCopy },
         },
       }));
-      await setDoc(doc(db, 'project', project.id), {
-        ...project,
-      });
+      updateProject(project.id);
     }
   };
   return (
