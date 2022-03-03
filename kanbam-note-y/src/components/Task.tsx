@@ -31,7 +31,7 @@ function Task({ boardKey, task, idx }: Iprops) {
 
   const onTaskSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    console.log('task submit');
+
     setProject((prev) => {
       const copyBoard = { ...prev.contents[boardKey] };
       const copyTasks = [...copyBoard.tasks];
@@ -49,11 +49,9 @@ function Task({ boardKey, task, idx }: Iprops) {
     setIsEditActive(false);
   };
   const updateProject = async (id: string, newProject: IProject) => {
-    console.log('task update', project);
     await setDoc(doc(db, 'projects', id), {
       ...newProject,
     });
-    console.log('task update', project);
   };
 
   const onTaskChanged = (event: React.FormEvent<HTMLInputElement>) => {

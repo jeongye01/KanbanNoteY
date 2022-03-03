@@ -1,14 +1,18 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { useParams } from 'react-router';
 import { Link, Redirect, Route, Switch } from 'react-router-dom';
 import gravatar from 'gravatar';
-import { useRecoilValue } from 'recoil';
+import { useRecoilValue, useRecoilState } from 'recoil';
 import { userState } from '../../Atoms/user';
 import Project from '../../Pages/Project';
 import Menu from '../../Components/Menu';
 import Modal from '../../Components/Modal';
 import ProjectList from '../../Components/ProjectList';
 import AddProjectModal from '../../Components/AddProjectModal';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { db } from '../../firebase';
+import { useParams } from 'react-router-dom';
+import { IboardsOrder, IProject } from '../../Typings/db';
+import { projectState, boardsOrderState } from '../../Atoms/project';
 import {
   AddButton,
   Channels,
@@ -29,9 +33,12 @@ import {
 
 const Workspace = () => {
   const user = useRecoilValue(userState);
-
+  const { projectId } = useParams<{ projectId?: string }>();
+  const [project, setProject] = useRecoilState(projectState);
+  const [boardsOrder, setBoardsOrder] = useRecoilState(boardsOrderState);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showAddProjectModal, setShowAddProjectModal] = useState(false);
+
   return (
     <div>
       <Header>

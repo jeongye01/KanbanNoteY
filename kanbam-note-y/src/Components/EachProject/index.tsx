@@ -4,29 +4,18 @@ import { NavLink, useLocation } from 'react-router-dom';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { IProject } from '../../Typings/db';
+import { boardsOrderState, projectState } from '../../Atoms/project';
+import { useRecoilState } from 'recoil';
 interface Props {
   projectId: string;
+  projectName: string;
 }
-function EachProject({ projectId }: Props) {
-  const [project, setProject] = useState<IProject>();
-  const fetchProject = async () => {
-    const docRef = doc(db, 'projects', projectId);
-    const docSnap = await getDoc(docRef);
-    if (docSnap.exists()) {
-      const { id, name, contents } = docSnap.data();
-      setProject({ id, name, contents });
-    }
-  };
-  useEffect(() => {
-    fetchProject();
-  }, []);
+function EachProject({ projectId, projectName }: Props) {
   return (
     <>
-      {project ? (
-        <NavLink activeClassName="selected" to={`/project/${projectId}`}>
-          <span>{project.name}</span>
-        </NavLink>
-      ) : null}
+      <NavLink activeClassName="selected" to={`/project/${projectId}`}>
+        <span>{projectName}</span>
+      </NavLink>
     </>
   );
 }

@@ -18,17 +18,15 @@ function Router() {
     if (user?.email) {
       const docRef = doc(db, 'users', user?.email);
       const docSnap = await getDoc(docRef);
-      console.log(docSnap.data());
+
       if (docSnap.exists()) {
-        console.log(docSnap.data());
-        const { name, email, uid, projectIds } = docSnap.data();
-        console.log(name, email, uid);
-        setUser({ name, email, uid, projectIds });
+        const { name, email, uid, projects } = docSnap.data();
+
+        setUser({ name, email, uid, projects });
         setLoggedIn(true);
       }
     }
   });
-  console.log(loggedIn);
 
   return (
     <BrowserRouter>

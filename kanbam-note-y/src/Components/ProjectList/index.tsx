@@ -11,19 +11,13 @@ import AddProjectModal from '../AddProjectModal';
 //import useSWR from 'swr';
 
 function ProjectList() {
-  const { workspace } = useParams<{ workspace?: string }>();
-  const [channelCollapse, setChannelCollapse] = useState(false);
-  const [user, setUser] = useRecoilState(userState);
-  const [addProjectModalOpen, setAddProjectModalOpen] = useState(false);
-  const toggleChannelCollapse = useCallback(() => {
-    setChannelCollapse((prev) => !prev);
-  }, []);
+  const user = useRecoilValue(userState);
 
   return (
     <>
       <div>
-        {user?.projectIds.map((projectId) => (
-          <EachProject key={projectId} projectId={projectId} />
+        {user?.projects.map((project) => (
+          <EachProject key={project.id} projectId={project.id} projectName={project.name} />
         ))}
       </div>
     </>

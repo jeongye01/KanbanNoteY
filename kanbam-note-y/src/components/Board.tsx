@@ -10,6 +10,7 @@ import Task from './Task';
 import { useSetRecoilState, useRecoilState, useRecoilValue } from 'recoil';
 import { doc, setDoc } from 'firebase/firestore';
 import { db } from '../firebase';
+import { useParams } from 'react-router-dom';
 const Container = styled.div`
   margin: 8px;
   border: 1px solid lightgrey;
@@ -35,7 +36,8 @@ interface Iprops {
   index: number;
 }
 function Board({ board, boardKey, index }: Iprops) {
-  console.log(boardKey, 'render');
+  const { projectId } = useParams<{ projectId?: string }>();
+  console.log(board);
   const [updatedBoardName, setUpdatedBoardName] = useState<string>(board.name);
   const [isTitleEditActive, setIsTitleEditActive] = useState<boolean>(false);
   const [newTask, setNewTask] = useState<string>('');
@@ -46,7 +48,7 @@ function Board({ board, boardKey, index }: Iprops) {
 
   const onTaskSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    console.log('new task submit');
+
     setProject((prev) => {
       const newTaskObj = { id: Date.now(), content: newTask };
       const newTasks = [...prev.contents[`${boardKey}`].tasks, newTaskObj];
@@ -62,10 +64,9 @@ function Board({ board, boardKey, index }: Iprops) {
     setNewTask('');
   };
   const updateProject = async (id: string, newProject: IProject) => {
-    console.log('update project', newProject);
-    await setDoc(doc(db, 'projects', id), {
+    -(await setDoc(doc(db, 'projects', id), {
       ...newProject,
-    });
+    }));
   };
   const updateBoardsOrder = async (id: string, newBoardsOrder: IboardsOrder) => {
     await setDoc(doc(db, 'boardsOrders', project.id), {
@@ -99,7 +100,7 @@ function Board({ board, boardKey, index }: Iprops) {
     setProject((prev) => {
       let copyBoard = { ...prev.contents[`${boardKey}`] };
       copyBoard['name'] = updatedBoardName;
-      console.log(copyBoard);
+
       const newProject = { ...prev, contents: { ...prev.contents, [`${boardKey}`]: copyBoard } };
       updateProject(project.id, newProject);
       return newProject;
@@ -108,44 +109,54 @@ function Board({ board, boardKey, index }: Iprops) {
     setIsTitleEditActive(false);
   };
   return (
-    <Draggable draggableId={boardKey} index={index}>
-      {(provided) => (
-        <Container {...provided.dragHandleProps} {...provided.draggableProps} ref={provided.innerRef}>
-          <Header>
-            {isTitleEditActive ? (
-              <form onSubmit={onEdit}>
-                <input onChange={onEditChange} type="text" value={updatedBoardName} />
-              </form>
-            ) : (
-              <Title onClick={() => setIsTitleEditActive(true)}>{board.name}</Title>
-            )}
+    <>
+      {true ? (
+        <>
+          <Draggable draggableId={boardKey} index={index}>
+            {(provided) => (
+              <Container {...provided.dragHandleProps} {...provided.draggableProps} ref={provided.innerRef}>
+                <Header>
+                  {isTitleEditActive ? (
+                    <form onSubmit={onEdit}>
+                      <input onChange={onEditChange} type="text" value={updatedBoardName} />
+                    </form>
+                  ) : (
+                    <Title onClick={() => setIsTitleEditActive(true)}>{board.name}</Title>
+                  )}
 
-            <button onClick={onDelete}>
-              <FontAwesomeIcon icon={faTrashCan} /> 삭제
-            </button>
-          </Header>
-          <Droppable droppableId={boardKey}>
-            {(provided, snapshot) => (
-              <TaskList ref={provided.innerRef} {...provided.droppableProps} isDraggingOver={snapshot.isDraggingOver}>
-                {board?.tasks?.map((task, idx) => (
-                  <Task boardKey={boardKey} task={task} idx={idx} key={task.id} />
-                ))}
-                {provided.placeholder}
-              </TaskList>
+                  <button onClick={onDelete}>
+                    <FontAwesomeIcon icon={faTrashCan} /> 삭제
+                  </button>
+                </Header>
+                <Droppable droppableId={boardKey}>
+                  {(provided, snapshot) => (
+                    <TaskList
+                      ref={provided.innerRef}
+                      {...provided.droppableProps}
+                      isDraggingOver={snapshot.isDraggingOver}
+                    >
+                      {board?.tasks?.map((task, idx) => (
+                        <Task boardKey={boardKey} task={task} idx={idx} key={task.id} />
+                      ))}
+                      {provided.placeholder}
+                    </TaskList>
+                  )}
+                </Droppable>
+                {isNewTaskActive ? (
+                  <form onSubmit={onTaskSubmit}>
+                    <input type="text" onChange={onTaskChanged} value={newTask} placeholder="이름을 입력하세요." />
+                    <input type="submit" value="할 일 추가" />
+                    <button onClick={() => setIsNewTaskActive(false)}>x</button>
+                  </form>
+                ) : (
+                  <button onClick={() => setIsNewTaskActive(true)}>+ 새로 만들기</button>
+                )}
+              </Container>
             )}
-          </Droppable>
-          {isNewTaskActive ? (
-            <form onSubmit={onTaskSubmit}>
-              <input type="text" onChange={onTaskChanged} value={newTask} placeholder="이름을 입력하세요." />
-              <input type="submit" value="할 일 추가" />
-              <button onClick={() => setIsNewTaskActive(false)}>x</button>
-            </form>
-          ) : (
-            <button onClick={() => setIsNewTaskActive(true)}>+ 새로 만들기</button>
-          )}
-        </Container>
-      )}
-    </Draggable>
+          </Draggable>
+        </>
+      ) : null}
+    </>
   );
 }
 

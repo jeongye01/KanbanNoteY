@@ -24,7 +24,6 @@ function Login() {
     clearErrors,
   } = useForm<IFormInputs>();
   const onSubmit: SubmitHandler<IFormInputs> = async (data) => {
-    console.log(data);
     const { email, password } = data;
     userLogin(email, password);
   };

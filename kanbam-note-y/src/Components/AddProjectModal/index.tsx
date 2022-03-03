@@ -7,7 +7,7 @@ import { db } from '../../firebase';
 import { userState } from '../../Atoms/user';
 import { doc, setDoc } from 'firebase/firestore';
 import { nanoid } from 'nanoid';
-import { defaultProjectContents, defaultBoardsOrder } from '../../Typings/db';
+import { defaultProjectContents, defaultBoardsOrder, IUser } from '../../Typings/db';
 
 interface Props {
   show: boolean;
@@ -16,8 +16,8 @@ interface Props {
 }
 function AddProjectModal() {
   const params = useParams<{ workspace?: string }>();
-  const [newProject, setNewProject] = useState<string>();
-  const [user, setUser] = useRecoilState(userState);
+  const [newProject, setNewProject] = useState<string>('');
+  const [user, setUser] = useRecoilState<IUser>(userState);
 
   const onSubmit = async (event: React.SyntheticEvent) => {
     event.preventDefault();
@@ -26,7 +26,7 @@ function AddProjectModal() {
       updateUser(id);
       createProject(id);
       createBoardsOrder(id);
-      return { ...prev, projectIds: [...prev.projectIds, id] };
+      return { ...prev, projects: [...prev.projects, { name: newProject, id }] };
     });
     console.log('add project', user);
   };
@@ -36,7 +36,7 @@ function AddProjectModal() {
   const updateUser = async (id: string) => {
     await setDoc(doc(db, 'users', user.email), {
       ...user,
-      projectIds: [...user.projectIds, id],
+      projects: [...user.projects, { name: newProject, id }],
     });
     console.log('add project', user);
   };

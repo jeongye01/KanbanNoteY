@@ -1,8 +1,12 @@
+interface projects {
+  name: string;
+  id: string;
+}
 export interface IUser {
   uid: string;
   name: string;
   email: string;
-  projectIds: string[];
+  projects: projects[];
 }
 
 export interface Itask {

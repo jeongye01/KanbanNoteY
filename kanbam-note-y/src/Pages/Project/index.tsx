@@ -18,7 +18,6 @@ const Container = styled.div`
 
 function Project() {
   const { projectId } = useParams<{ projectId?: string }>();
-  console.log(projectId, 'project');
   const [project, setProject] = useRecoilState(projectState);
   const [boardsOrder, setBoardsOrder] = useRecoilState(boardsOrderState);
   const [newBoardName, setNewBoardName] = useState<string>('');
@@ -47,7 +46,6 @@ function Project() {
   };
 
   const updateProject = async (newProject: IProject) => {
-    console.log('update project', projectId);
     if (projectId) {
       await setDoc(doc(db, 'projects', projectId), {
         ...newProject,
@@ -55,7 +53,6 @@ function Project() {
     }
   };
   const updateBoardsOrder = async (newBoardsOrder: IboardsOrder) => {
-    console.log('update boardsOrder', projectId);
     if (projectId) {
       await setDoc(doc(db, 'boardsOrders', projectId), {
         ...newBoardsOrder,
@@ -80,7 +77,7 @@ function Project() {
       setBoardsOrder((prev) => {
         const newBoardsOrder = { ...prev, order: newOrder };
         updateBoardsOrder(newBoardsOrder);
-        console.log(newBoardsOrder, 'newBoardsOrder');
+
         return newBoardsOrder;
       });
 
@@ -126,15 +123,15 @@ function Project() {
     if (docSnap.exists()) {
       const { id, name, contents } = docSnap.data();
       setProject({ id, name, contents });
-      console.log('project', project);
     }
   };
+
   const fetchBoardsOrder = async (projectId: string) => {
     const docRef = doc(db, 'boardsOrders', projectId);
-    console.log('order', projectId);
+
     const docSnap = await getDoc(docRef);
     if (docSnap.exists()) {
-      console.log('왜 안나타나');
+      console.log('order', boardsOrder);
       const { projectId, order } = docSnap.data();
 
       setBoardsOrder({ projectId, order });
@@ -148,22 +145,26 @@ function Project() {
   }, [projectId]);
   return (
     <>
-      <DragDropContext onDragEnd={onDragEnd}>
-        <Droppable droppableId="all-boards" direction="horizontal" type="column">
-          {(provided) => (
-            <Container {...provided.droppableProps} ref={provided.innerRef}>
-              {boardsOrder.order?.map((boardId, index) => (
-                <Board board={project.contents[boardId]} key={boardId} boardKey={boardId} index={index} />
-              ))}
-              {provided.placeholder}
-            </Container>
-          )}
-        </Droppable>
-      </DragDropContext>
-      <form onSubmit={onNewBoardSubmit}>
-        <input onChange={onNewBoardChange} name="newBoard" type="text" placeholder="Enter list title..." />
-        <input type="submit" value="Add list" />
-      </form>
+      {project.id === boardsOrder.projectId ? (
+        <>
+          <DragDropContext onDragEnd={onDragEnd}>
+            <Droppable droppableId="all-boards" direction="horizontal" type="column">
+              {(provided) => (
+                <Container {...provided.droppableProps} ref={provided.innerRef}>
+                  {boardsOrder?.order?.map((boardId, index) => (
+                    <Board board={project.contents[boardId]} key={boardId} boardKey={boardId} index={index} />
+                  ))}
+                  {provided.placeholder}
+                </Container>
+              )}
+            </Droppable>
+          </DragDropContext>
+          <form onSubmit={onNewBoardSubmit}>
+            <input onChange={onNewBoardChange} name="newBoard" type="text" placeholder="Enter list title..." />
+            <input type="submit" value="Add list" />
+          </form>
+        </>
+      ) : null}
     </>
   );
 }

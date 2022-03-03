@@ -24,7 +24,6 @@ function Signup() {
   const password = useRef({});
   password.current = watch('password', '');
   const onSubmit: SubmitHandler<IFormInputs> = async (data) => {
-    console.log(data);
     const { name, email, password, password_check } = data;
 
     const docRef = doc(db, 'users', email);

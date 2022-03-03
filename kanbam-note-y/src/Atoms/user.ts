@@ -7,6 +7,6 @@ export const userState = atom<IUser>({
     uid: '',
     name: '',
     email: '',
-    projectIds: [],
+    projects: [],
   },
 });
