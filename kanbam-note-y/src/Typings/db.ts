@@ -39,3 +39,5 @@ export const defaultProjectContents = {
 
   Done: { name: 'Done', tasks: [] },
 };
+
+export const defaultBoardsOrder = ['ToDo', 'Doing', 'Done'];

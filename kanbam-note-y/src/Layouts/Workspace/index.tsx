@@ -29,6 +29,7 @@ import {
 
 const Workspace = () => {
   const user = useRecoilValue(userState);
+
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showAddProjectModal, setShowAddProjectModal] = useState(false);
   return (

@@ -5,7 +5,7 @@ import { faEllipsis, faPenToSquare, faTrashCan } from '@fortawesome/free-solid-s
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { boardsOrderState, projectState } from '../Atoms/project';
 import { userState } from '../Atoms/user';
-import { IboardInfo, Itask } from '../Typings/db';
+import { IboardInfo, IboardsOrder, IProject, Itask } from '../Typings/db';
 import Task from './Task';
 import { useSetRecoilState, useRecoilState, useRecoilValue } from 'recoil';
 import { doc, setDoc } from 'firebase/firestore';
@@ -43,27 +43,34 @@ function Board({ board, boardKey, index }: Iprops) {
   const [project, setProject] = useRecoilState(projectState);
   const [boardsOrder, setBoardsOrder] = useRecoilState(boardsOrderState);
   const user = useRecoilValue(userState);
-  const updateProject = async (id: string) => {
-    await setDoc(doc(db, 'projects', project.id), {
-      ...project,
-    });
-  };
-  const updateBoardsOrder = async (id: string) => {
-    await setDoc(doc(db, 'boardsOrders', project.id), {
-      ...boardsOrder,
-    });
-  };
+
   const onTaskSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-
+    console.log('new task submit');
     setProject((prev) => {
       const newTaskObj = { id: Date.now(), content: newTask };
       const newTasks = [...prev.contents[`${boardKey}`].tasks, newTaskObj];
+      const newProject = {
+        ...prev,
+        contents: { ...prev.contents, [`${boardKey}`]: { name: board.name, tasks: newTasks } },
+      };
+      updateProject(project.id, newProject);
 
-      return { ...prev, contents: { ...prev.contents, [`${boardKey}`]: { name: board.name, tasks: newTasks } } };
+      return newProject;
     });
-    updateProject(project.id);
+
     setNewTask('');
+  };
+  const updateProject = async (id: string, newProject: IProject) => {
+    console.log('update project', newProject);
+    await setDoc(doc(db, 'projects', id), {
+      ...newProject,
+    });
+  };
+  const updateBoardsOrder = async (id: string, newBoardsOrder: IboardsOrder) => {
+    await setDoc(doc(db, 'boardsOrders', project.id), {
+      ...newBoardsOrder,
+    });
   };
   const onTaskChanged = (event: React.FormEvent<HTMLInputElement>) => {
     setNewTask(event.currentTarget.value);
@@ -72,15 +79,17 @@ function Board({ board, boardKey, index }: Iprops) {
     setBoardsOrder((prev) => {
       const newOrder = [...prev.order];
       newOrder.splice(index, 1);
-      return { ...prev, order: newOrder };
+      const newBoardsOrder = { ...prev, order: newOrder };
+      updateBoardsOrder(project.id, newBoardsOrder);
+      return newBoardsOrder;
     });
     setProject((prev) => {
       const newBoards = { ...prev.contents };
       delete newBoards[`${boardKey}`];
-      return { ...prev, contents: newBoards };
+      const newProject = { ...prev, contents: newBoards };
+      updateProject(project.id, newProject);
+      return newProject;
     });
-    updateBoardsOrder(project.id);
-    updateProject(project.id);
   };
   const onEditChange = (event: React.FormEvent<HTMLInputElement>) => {
     setUpdatedBoardName(event.currentTarget.value);
@@ -91,9 +100,11 @@ function Board({ board, boardKey, index }: Iprops) {
       let copyBoard = { ...prev.contents[`${boardKey}`] };
       copyBoard['name'] = updatedBoardName;
       console.log(copyBoard);
-      return { ...prev, contents: { ...prev.contents, [`${boardKey}`]: copyBoard } };
+      const newProject = { ...prev, contents: { ...prev.contents, [`${boardKey}`]: copyBoard } };
+      updateProject(project.id, newProject);
+      return newProject;
     });
-    updateProject(project.id);
+
     setIsTitleEditActive(false);
   };
   return (

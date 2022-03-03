@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { faPenToSquare, faTrashCan } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { boardsOrderState, projectState } from '../Atoms/project';
-import { Itask } from '../Typings/db';
+import { IProject, Itask } from '../Typings/db';
 import { userState } from '../Atoms/user';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { doc, setDoc } from 'firebase/firestore';
@@ -28,28 +28,34 @@ function Task({ boardKey, task, idx }: Iprops) {
 
   const [project, setProject] = useRecoilState(projectState);
   const user = useRecoilValue(userState);
-  const updateProject = async (id: string) => {
-    await setDoc(doc(db, 'projects', project.id), {
-      ...project,
-    });
-    console.log('task update', project);
-  };
 
   const onTaskSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-
+    console.log('task submit');
     setProject((prev) => {
       const copyBoard = { ...prev.contents[boardKey] };
       const copyTasks = [...copyBoard.tasks];
       const { id } = copyTasks[idx];
       copyTasks.splice(idx, 0, { id, content: updatedTaskName });
       copyTasks.splice(idx + 1, 1);
-
-      return { ...prev, contents: { ...prev.contents, [`${boardKey}`]: { name: copyBoard.name, tasks: copyTasks } } };
+      const newProject = {
+        ...prev,
+        contents: { ...prev.contents, [`${boardKey}`]: { name: copyBoard.name, tasks: copyTasks } },
+      };
+      updateProject(project.id, newProject);
+      return newProject;
     });
-    updateProject(project.id);
+
     setIsEditActive(false);
   };
+  const updateProject = async (id: string, newProject: IProject) => {
+    console.log('task update', project);
+    await setDoc(doc(db, 'projects', id), {
+      ...newProject,
+    });
+    console.log('task update', project);
+  };
+
   const onTaskChanged = (event: React.FormEvent<HTMLInputElement>) => {
     setUpdatedTaskName(event.currentTarget.value);
   };
@@ -60,10 +66,13 @@ function Task({ boardKey, task, idx }: Iprops) {
       const copyTasks = [...copyBoard.tasks];
 
       copyTasks.splice(idx, 1);
-
-      return { ...prev, contents: { ...prev.contents, [`${boardKey}`]: { name: copyBoard.name, tasks: copyTasks } } };
+      const newProject = {
+        ...prev,
+        contents: { ...prev.contents, [`${boardKey}`]: { name: copyBoard.name, tasks: copyTasks } },
+      };
+      updateProject(project.id, newProject);
+      return newProject;
     });
-    updateProject(project.id);
   };
   return (
     <Draggable draggableId={`${task.id}`} index={idx}>

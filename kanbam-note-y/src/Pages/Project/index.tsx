@@ -2,12 +2,14 @@ import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautif
 import { boardsOrderState, projectState } from '../../Atoms/project';
 import { userState } from '../../Atoms/user';
 import { useRecoilState, useRecoilValue, useResetRecoilState } from 'recoil';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Workspace from '../../Layouts/Workspace';
 import styled from 'styled-components';
 import Board from '../../Components/Board';
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../../firebase';
+import { useParams } from 'react-router-dom';
+import { IboardsOrder, IProject } from '../../Typings/db';
 const Container = styled.div`
   margin: 8px;
   border: 1px solid lightgrey;
@@ -15,6 +17,8 @@ const Container = styled.div`
 `;
 
 function Project() {
+  const { projectId } = useParams<{ projectId?: string }>();
+  console.log(projectId, 'project');
   const [project, setProject] = useRecoilState(projectState);
   const [boardsOrder, setBoardsOrder] = useRecoilState(boardsOrderState);
   const [newBoardName, setNewBoardName] = useState<string>('');
@@ -26,28 +30,30 @@ function Project() {
 
     setProject((prev) => {
       console.log(id);
-      return {
+      const newProject = {
         ...prev,
         contents: { ...prev.contents, [`${id}`]: { name: newBoardName, tasks: [] } },
       };
+      updateProject(project.id, newProject);
+      return newProject;
     });
-    updateProject(id.toString());
+
     setBoardsOrder((prev) => {
       console.log(id);
-      const order = prev.order;
+      const newBoardsOrder = { ...prev, order: [...prev.order, id.toString()] };
+      updateBoardsOrder(project.id, newBoardsOrder);
+      return newBoardsOrder;
+    });
+  };
 
-      return { ...prev, order: [...prev.order, id.toString()] };
-    });
-    updateBoardsOrder(id.toString());
-  };
-  const updateProject = async (id: string) => {
-    await setDoc(doc(db, 'projects', project.id), {
-      ...project,
+  const updateProject = async (id: string, newProject: IProject) => {
+    await setDoc(doc(db, 'projects', id), {
+      ...newProject,
     });
   };
-  const updateBoardsOrder = async (id: string) => {
-    await setDoc(doc(db, 'boardsOrders', project.id), {
-      ...boardsOrder,
+  const updateBoardsOrder = async (id: string, newBoardsOrder: IboardsOrder) => {
+    await setDoc(doc(db, 'boardsOrders', id), {
+      ...newBoardsOrder,
     });
   };
   const onNewBoardChange = (event: React.FormEvent<HTMLInputElement>) => {
@@ -65,8 +71,12 @@ function Project() {
       newOrder.splice(source.index, 1);
       newOrder.splice(destination.index, 0, draggableId);
 
-      setBoardsOrder((prev) => ({ ...prev, order: newOrder }));
-      updateBoardsOrder(project.id);
+      setBoardsOrder((prev) => {
+        const newBoardsOrder = { ...prev, order: newOrder };
+        updateBoardsOrder(project.id, newBoardsOrder);
+        return newBoardsOrder;
+      });
+
       return;
     }
 
@@ -76,27 +86,55 @@ function Project() {
     sourceTasksCopy.splice(source.index, 1);
     if (destination.droppableId === source.droppableId) {
       sourceTasksCopy.splice(destination.index, 0, taskObj);
-      setProject((prev) => ({
-        ...prev,
-        contents: { ...prev.contents, [source.droppableId]: { name: sourceName, tasks: sourceTasksCopy } },
-      }));
-      updateProject(project.id);
+      setProject((prev) => {
+        const newProject = {
+          ...prev,
+          contents: { ...prev.contents, [source.droppableId]: { name: sourceName, tasks: sourceTasksCopy } },
+        };
+        updateProject(project.id, newProject);
+        return newProject;
+      });
     }
     if (destination.droppableId !== source.droppableId) {
       const destinationTasksCopy = [...project.contents[destination.droppableId].tasks];
       const destinationName = project.contents[destination.droppableId].name;
       destinationTasksCopy.splice(destination.index, 0, taskObj);
-      setProject((prev) => ({
-        ...prev,
-        contents: {
-          ...prev.contents,
-          [source.droppableId]: { name: sourceName, tasks: sourceTasksCopy },
-          [destination.droppableId]: { name: destinationName, tasks: destinationTasksCopy },
-        },
-      }));
-      updateProject(project.id);
+      setProject((prev) => {
+        const newProject = {
+          ...prev,
+          contents: {
+            ...prev.contents,
+            [source.droppableId]: { name: sourceName, tasks: sourceTasksCopy },
+            [destination.droppableId]: { name: destinationName, tasks: destinationTasksCopy },
+          },
+        };
+        updateProject(project.id, newProject);
+        return newProject;
+      });
     }
   };
+  const fetchProject = async (projectId: string) => {
+    const docRef = doc(db, 'projects', projectId);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      const { id, name, contents } = docSnap.data();
+      setProject({ id, name, contents });
+    }
+  };
+  const fetchBoardsOrder = async (projectId: string) => {
+    const docRef = doc(db, 'boardsOrder', projectId);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      const { projectId, order } = docSnap.data();
+      setBoardsOrder({ projectId, order });
+    }
+  };
+  useEffect(() => {
+    if (projectId) {
+      fetchProject(projectId);
+      fetchBoardsOrder(projectId);
+    }
+  }, [projectId]);
   return (
     <>
       <DragDropContext onDragEnd={onDragEnd}>

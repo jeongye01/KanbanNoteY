@@ -7,7 +7,7 @@ import { db } from '../../firebase';
 import { userState } from '../../Atoms/user';
 import { doc, setDoc } from 'firebase/firestore';
 import { nanoid } from 'nanoid';
-import { defaultProjectContents } from '../../Typings/db';
+import { defaultProjectContents, defaultBoardsOrder } from '../../Typings/db';
 
 interface Props {
   show: boolean;
@@ -26,6 +26,7 @@ function AddProjectModal() {
     console.log('add project', user);
     updateUser(id);
     createProject(id);
+    createBoardsOrder(id);
   };
   const onChange = (event: React.FormEvent<HTMLInputElement>) => {
     setNewProject(event.currentTarget.value);
@@ -43,11 +44,14 @@ function AddProjectModal() {
       name: newProject,
       contents: defaultProjectContents,
     });
+
+    console.log('add project', user);
+  };
+  const createBoardsOrder = async (id: string) => {
     await setDoc(doc(db, 'boardsOrders', id), {
       projectId: id,
-      orders: [Object.keys(defaultProjectContents)],
+      orders: defaultBoardsOrder,
     });
-    console.log('add project', user);
   };
   return (
     <form onSubmit={onSubmit}>
