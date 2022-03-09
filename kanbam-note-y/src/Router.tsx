@@ -10,9 +10,10 @@ import { auth } from './firebase';
 import { userLogin, db } from './firebase';
 import { doc, getDoc } from 'firebase/firestore';
 import { useSetRecoilState } from 'recoil';
-import { userState } from './Atoms/user';
+import { userState, isLoggedIn } from './Atoms/user';
+import { useRecoilState } from 'recoil';
 function Router() {
-  const [loggedIn, setLoggedIn] = useState<boolean>();
+  const [loggedIn, setIsLoggedIn] = useRecoilState(isLoggedIn);
   const setUser = useSetRecoilState(userState);
   onAuthStateChanged(auth, async (user) => {
     if (user?.email) {
@@ -23,7 +24,7 @@ function Router() {
         const { name, email, uid, projects } = docSnap.data();
 
         setUser({ name, email, uid, projects });
-        setLoggedIn(true);
+        setIsLoggedIn(true);
       }
     }
   });

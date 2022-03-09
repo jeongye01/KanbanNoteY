@@ -1,3 +1,4 @@
+import { faRightToBracket } from '@fortawesome/free-solid-svg-icons';
 import { createGlobalStyle, DefaultTheme } from 'styled-components';
 import reset from 'styled-reset';
 
@@ -9,7 +10,7 @@ const GlobalStyle = createGlobalStyle`
   }
   body{
     font-family: 'Source Sans Pro', sans-serif;
-    background-color:${(props) => props.theme.bgColor};
+    background-color:${(props) => props.theme.innerbgColor};
     color:${(props) => props.theme.textColor};
     font-size:16px;
   }
@@ -20,7 +21,8 @@ const GlobalStyle = createGlobalStyle`
 `;
 
 export const theme: DefaultTheme = {
-  bgColor: '#FAFAFA',
+  outerbgColor: '#93D42E',
+  innerbgColor: '#FAFAFA',
   textColor: 'black',
   accentColor: '#93D42E',
 };

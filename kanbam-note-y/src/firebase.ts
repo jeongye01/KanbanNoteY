@@ -1,5 +1,11 @@
 import { initializeApp } from 'firebase/app';
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from 'firebase/auth';
+import {
+  getAuth,
+  signOut,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  onAuthStateChanged,
+} from 'firebase/auth';
 import { doc, setDoc, getDoc, getFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
@@ -55,6 +61,16 @@ export const userLogin = (email: string, password: string) => {
       const errorCode = error.code;
       const errorMessage = error.message;
       console.log(errorMessage);
+    });
+};
+
+export const logout = () => {
+  signOut(auth)
+    .then(() => {
+      console.log('Sign-out successful.');
+    })
+    .catch((error) => {
+      console.log('// An error happened.');
     });
 };
 

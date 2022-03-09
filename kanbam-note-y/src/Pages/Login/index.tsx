@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import { useState, useRef } from 'react';
 import { Link, useHistory } from 'react-router-dom';
-import { Container, Wrapper, Logo, Form, Error } from '../SignUp/styles';
+import { Container, Wrapper, Logo, Form, Error, Submit, LinkMessage } from '../SignUp/styles';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { userLogin, db, user } from '../../firebase';
 import { onAuthStateChanged } from 'firebase/auth';
@@ -54,10 +54,11 @@ function Login() {
             onClick={() => clearErrors('password')}
           />
           {fail ? <Error>알수 없는 오류가 발생했습니다.</Error> : null}
-          <button>로그인</button>
-          <div>
-            <Link to={'/signup'}>회원가입</Link>
-          </div>
+          <Submit type="submit" value="로그인" />
+
+          <LinkMessage>
+            계정이 아직 없으신가요? <Link to={'/signup'}>회원가입</Link>
+          </LinkMessage>
         </Form>
       </Wrapper>
     </Container>

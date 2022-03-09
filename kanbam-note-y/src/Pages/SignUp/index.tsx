@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Container, Wrapper, Logo, Form, Submit, Error } from './styles';
+import { Container, Wrapper, Logo, Form, Submit, Error, LinkMessage } from './styles';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { db, createUser } from '../../firebase';
 import { useHistory } from 'react-router-dom';
@@ -86,9 +86,9 @@ function Signup() {
           />
           {fail ? <Error>이미 존재하는 이메일 입니다.</Error> : null}
           <Submit type="submit" value="가입 하기" />
-          <div>
-            <Link to={'/login'}>로그인</Link>
-          </div>
+          <LinkMessage>
+            계정이 있으신가요? <Link to={'/login'}>로그인</Link>
+          </LinkMessage>
         </Form>
       </Wrapper>
     </Container>

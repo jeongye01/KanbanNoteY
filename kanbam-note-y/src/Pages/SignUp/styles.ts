@@ -32,6 +32,7 @@ export const Form = styled.form`
   h1 {
     text-align: center;
     padding: 10px;
+    margin-bottom: 15px;
   }
   input {
     margin: 0.5rem 0 0.8rem 0;
@@ -64,5 +65,12 @@ export const Submit = styled.input`
   margin-top: 20px;
   &:hover {
     opacity: 0.8;
+  }
+`;
+
+export const LinkMessage = styled.div`
+  font-size: 12px;
+  a {
+    color: ${(props) => props.theme.accentColor};
   }
 `;

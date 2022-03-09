@@ -1,15 +1,15 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Link, Redirect, Route, Switch } from 'react-router-dom';
+import { Link, Redirect, Route, Switch, useHistory } from 'react-router-dom';
 import gravatar from 'gravatar';
-import { useRecoilValue, useRecoilState } from 'recoil';
-import { userState } from '../../Atoms/user';
+import { useRecoilValue, useRecoilState, useSetRecoilState } from 'recoil';
+import { userState, isLoggedIn } from '../../Atoms/user';
 import Project from '../../Pages/Project';
 import Menu from '../../Components/Menu';
 import Modal from '../../Components/Modal';
 import ProjectList from '../../Components/ProjectList';
 import AddProjectModal from '../../Components/AddProjectModal';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { db } from '../../firebase';
+import { db, auth, logout, userLogin } from '../../firebase';
 import { useParams } from 'react-router-dom';
 import { IboardsOrder, IProject } from '../../Typings/db';
 import { projectState, boardsOrderState } from '../../Atoms/project';
@@ -30,9 +30,13 @@ import {
   Workspaces,
   WorkspaceWrapper,
 } from './styles';
+import { faCirclePlus } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 const Workspace = () => {
+  const history = useHistory();
   const user = useRecoilValue(userState);
+  const setIsLoggedIn = useSetRecoilState(isLoggedIn);
   const { projectId } = useParams<{ projectId?: string }>();
   const [project, setProject] = useRecoilState(projectState);
   const [boardsOrder, setBoardsOrder] = useRecoilState(boardsOrderState);
@@ -66,7 +70,14 @@ const Workspace = () => {
                     <span id="profile-active">Active</span>
                   </div>
                 </ProfileModal>
-                <LogOutButton>로그아웃</LogOutButton>
+                <LogOutButton
+                  onClick={() => {
+                    setIsLoggedIn(false);
+                    logout();
+                  }}
+                >
+                  로그아웃
+                </LogOutButton>
               </Menu>
             )}
           </RightMenu>
@@ -74,11 +85,13 @@ const Workspace = () => {
       </Header>
       <WorkspaceWrapper>
         <Channels>
-          <WorkspaceName>Yanban</WorkspaceName>
+          <WorkspaceName>Yanban ✅</WorkspaceName>
           <MenuScroll>
             <AddProject>
               <span>Your Projects</span>
-              <button onClick={() => setShowAddProjectModal((prev) => !prev)}>+</button>
+              <button onClick={() => setShowAddProjectModal((prev) => !prev)}>
+                <FontAwesomeIcon icon={faCirclePlus} />
+              </button>
             </AddProject>
             <ProjectList />
             {showAddProjectModal && (

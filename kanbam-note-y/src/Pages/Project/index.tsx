@@ -12,6 +12,7 @@ import { useParams } from 'react-router-dom';
 import { IboardsOrder, IProject } from '../../Typings/db';
 const Container = styled.div`
   margin: 8px;
+
   border: 1px solid lightgrey;
   display: flex;
 `;
@@ -21,8 +22,14 @@ function Project() {
   const [project, setProject] = useRecoilState(projectState);
   const [boardsOrder, setBoardsOrder] = useRecoilState(boardsOrderState);
   const [newBoardName, setNewBoardName] = useState<string>('');
+
   const user = useRecoilValue(userState);
   console.log(boardsOrder, project, 'init');
+
+  const onProjectNameSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+  };
+
   const onNewBoardSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const id = Date.now();
@@ -146,7 +153,7 @@ function Project() {
   return (
     <>
       {project.id === boardsOrder.projectId ? (
-        <>
+        <Container>
           <DragDropContext onDragEnd={onDragEnd}>
             <Droppable droppableId="all-boards" direction="horizontal" type="column">
               {(provided) => (
@@ -163,7 +170,7 @@ function Project() {
             <input onChange={onNewBoardChange} name="newBoard" type="text" placeholder="Enter list title..." />
             <input type="submit" value="Add list" />
           </form>
-        </>
+        </Container>
       ) : null}
     </>
   );

@@ -10,3 +10,8 @@ export const userState = atom<IUser>({
     projects: [],
   },
 });
+
+export const isLoggedIn = atom<boolean>({
+  key: 'userLoggedIn',
+  default: false,
+});
