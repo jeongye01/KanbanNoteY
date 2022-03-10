@@ -26,7 +26,7 @@ export const ProfileImg = styled.img`
 export const ProfileModal = styled.div`
   display: flex;
   padding: 20px;
-
+  min-width: 360px;
   & img {
     display: flex;
   }

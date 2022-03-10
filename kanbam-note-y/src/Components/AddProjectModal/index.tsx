@@ -8,6 +8,29 @@ import { userState } from '../../Atoms/user';
 import { doc, setDoc } from 'firebase/firestore';
 import { nanoid } from 'nanoid';
 import { defaultProjectContents, defaultBoardsOrder, IUser } from '../../Typings/db';
+import styled from 'styled-components';
+
+const Container = styled.div`
+  min-width: 160px;
+`;
+
+const Form = styled.form`
+  padding: 10px;
+
+  h1 {
+    margin-bottom: 15px;
+  }
+  input {
+    color: #322d39;
+    outline: none;
+    padding: 0.3rem;
+    border: 2px solid ${(props) => props.theme.accentColor};
+
+    &:focus {
+      border-color: orange;
+    }
+  }
+`;
 
 interface Props {
   show: boolean;
@@ -28,6 +51,7 @@ function AddProjectModal() {
       createBoardsOrder(id);
       return { ...prev, projects: [...prev.projects, { name: newProject, id }] };
     });
+    setNewProject('');
     console.log('add project', user);
   };
   const onChange = (event: React.FormEvent<HTMLInputElement>) => {
@@ -56,12 +80,12 @@ function AddProjectModal() {
     });
   };
   return (
-    <form onSubmit={onSubmit}>
-      <label>
-        <span>프로젝트 이름</span>
-        <input name="board-title" type="text" onChange={onChange} />
-      </label>
-    </form>
+    <Container>
+      <Form onSubmit={onSubmit}>
+        <h1>New Project 😀</h1>
+        <input name="board-title" type="text" value={newProject} onChange={onChange} />
+      </Form>
+    </Container>
   );
 }
 

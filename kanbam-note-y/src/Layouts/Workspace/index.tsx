@@ -30,7 +30,7 @@ import {
   Workspaces,
   WorkspaceWrapper,
 } from './styles';
-import { faCirclePlus } from '@fortawesome/free-solid-svg-icons';
+import { faCirclePlus, faCircleXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 const Workspace = () => {
@@ -90,7 +90,11 @@ const Workspace = () => {
             <AddProject>
               <span>Your Projects</span>
               <button onClick={() => setShowAddProjectModal((prev) => !prev)}>
-                <FontAwesomeIcon icon={faCirclePlus} />
+                {showAddProjectModal ? (
+                  <FontAwesomeIcon icon={faCircleXmark} />
+                ) : (
+                  <FontAwesomeIcon icon={faCirclePlus} />
+                )}
               </button>
             </AddProject>
             <ProjectList />
