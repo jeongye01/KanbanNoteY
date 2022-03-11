@@ -1,6 +1,12 @@
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 
+export const Body = styled.body`
+  background: white;
+  width: 100%;
+  height: 100vh;
+`;
+
 export const Container = styled.div`
   width: 100%;
   max-width: 440px;

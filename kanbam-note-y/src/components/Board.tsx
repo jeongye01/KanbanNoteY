@@ -1,7 +1,13 @@
 import React, { useState } from 'react';
 import { Droppable, Draggable } from 'react-beautiful-dnd';
 import styled from 'styled-components';
-import { faEllipsis, faPenToSquare, faTrashCan } from '@fortawesome/free-solid-svg-icons';
+import {
+  faEllipsis,
+  faPenToSquare,
+  faTrashCan,
+  faPenSquare,
+  faArrowRotateLeft,
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { boardsOrderState, projectState } from '../Atoms/project';
 import { userState } from '../Atoms/user';
@@ -11,16 +17,18 @@ import { useSetRecoilState, useRecoilState, useRecoilValue } from 'recoil';
 import { doc, setDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import { useParams } from 'react-router-dom';
+import EditRemoveBox from './EditRemoveBox';
 const Container = styled.div`
   margin: 8px;
   border: 1px solid lightgrey;
-  border-radius: 2px;
+  border-radius: 8px;
   display: flex;
   flex-direction: column;
+  align-items: center;
+  background-color: white;
+  padding: 5px;
 `;
-const Title = styled.button`
-  padding: 8px;
-`;
+const Title = styled.span``;
 const TaskList = styled.ul<{ isDraggingOver: boolean }>`
   padding: 8px;
   transition: background-color 0.2s ease;
@@ -28,7 +36,19 @@ const TaskList = styled.ul<{ isDraggingOver: boolean }>`
   width: 275px;
   min-height: 100px;
 `;
-const Header = styled.header``;
+
+const Add = styled.button`
+  opacity: 0.7;
+`;
+const Header = styled.header`
+  width: 100%;
+  padding: 0 5px;
+  button,
+  ul {
+    color: ${(props) => props.theme.buttonColor};
+  }
+  margin-bottom: 5px;
+`;
 const Modal = styled.div``;
 interface Iprops {
   boardKey: string;
@@ -38,8 +58,8 @@ interface Iprops {
 function Board({ board, boardKey, index }: Iprops) {
   const { projectId } = useParams<{ projectId?: string }>();
   console.log(board);
+
   const [updatedBoardName, setUpdatedBoardName] = useState<string>(board.name);
-  const [isTitleEditActive, setIsTitleEditActive] = useState<boolean>(false);
   const [newTask, setNewTask] = useState<string>('');
   const [isNewTaskActive, setIsNewTaskActive] = useState<boolean>(false);
   const [project, setProject] = useRecoilState(projectState);
@@ -105,8 +125,6 @@ function Board({ board, boardKey, index }: Iprops) {
       updateProject(project.id, newProject);
       return newProject;
     });
-
-    setIsTitleEditActive(false);
   };
   return (
     <>
@@ -116,18 +134,15 @@ function Board({ board, boardKey, index }: Iprops) {
             {(provided) => (
               <Container {...provided.dragHandleProps} {...provided.draggableProps} ref={provided.innerRef}>
                 <Header>
-                  {isTitleEditActive ? (
-                    <form onSubmit={onEdit}>
-                      <input onChange={onEditChange} type="text" value={updatedBoardName} />
-                    </form>
-                  ) : (
-                    <Title onClick={() => setIsTitleEditActive(true)}>{board.name}</Title>
-                  )}
-
-                  <button onClick={onDelete}>
-                    <FontAwesomeIcon icon={faTrashCan} /> 삭제
-                  </button>
+                  <EditRemoveBox
+                    onEdit={onEdit}
+                    onInputChange={onEditChange}
+                    inputValue={updatedBoardName}
+                    text={board.name}
+                    onDelete={onDelete}
+                  />
                 </Header>
+
                 <Droppable droppableId={boardKey}>
                   {(provided, snapshot) => (
                     <TaskList
@@ -149,7 +164,7 @@ function Board({ board, boardKey, index }: Iprops) {
                     <button onClick={() => setIsNewTaskActive(false)}>x</button>
                   </form>
                 ) : (
-                  <button onClick={() => setIsNewTaskActive(true)}>+ 새로 만들기</button>
+                  <Add onClick={() => setIsNewTaskActive(true)}>+ 새로 만들기</Add>
                 )}
               </Container>
             )}

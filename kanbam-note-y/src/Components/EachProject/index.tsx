@@ -10,6 +10,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import styled from 'styled-components';
 import { doc, deleteDoc, setDoc, getDoc } from 'firebase/firestore';
 import { userState } from '../../Atoms/user';
+import EditRemoveBox from '../EditRemoveBox';
 
 interface Props {
   projectId: string;
@@ -17,32 +18,20 @@ interface Props {
 }
 
 const Container = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   margin-bottom: 2px;
+  &:hover {
+    background-color: ${(props) => props.theme.buttonColor};
+  }
   input {
     margin-left: 30px;
   }
-  button {
-    all: unset;
-    font-size: 18px;
-    cursor: pointer;
-    margin-right: 10px;
-  }
+  button,
   ul {
-    display: flex;
-    align-items: center;
     margin-right: 10px;
-    li {
-      margin-left: 5px;
-    }
   }
 `;
 
 function EachProject({ projectId, projectName }: Props) {
-  const [modalOpen, setModalOpen] = useState(false);
-  const [editMode, setEditMode] = useState(false);
   const [newProjectName, setNewProjectName] = useState('');
   const [user, setUser] = useRecoilState<IUser>(userState);
   const onNewProjectNameSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -69,7 +58,6 @@ function EachProject({ projectId, projectName }: Props) {
         return updatedUser;
       });
     }
-    setEditMode(false);
   };
   const onDelete = async () => {
     await deleteDoc(doc(db, 'projects', projectId));
@@ -85,47 +73,17 @@ function EachProject({ projectId, projectName }: Props) {
       ...userInfo,
     });
   };
+  const onInputChange = (event: React.FormEvent<HTMLInputElement>) => setNewProjectName(event.currentTarget.value);
   return (
     <Container>
-      {modalOpen && editMode ? (
-        <form onSubmit={onNewProjectNameSubmit}>
-          {' '}
-          <input
-            type="text"
-            placeholder={newProjectName || projectName}
-            onChange={(event: React.FormEvent<HTMLInputElement>) => setNewProjectName(event.currentTarget.value)}
-            required
-          />
-        </form>
-      ) : (
-        <NavLink activeClassName="selected" to={`/project/${projectId}`}>
-          <span>{projectName}</span>
-        </NavLink>
-      )}
-
-      {modalOpen ? (
-        <ul>
-          <li onClick={() => setEditMode(true)}>
-            <FontAwesomeIcon icon={faPenSquare} />
-          </li>
-          <li onClick={onDelete}>
-            <FontAwesomeIcon icon={faTrashCan} />
-          </li>
-
-          <li
-            onClick={() => {
-              setModalOpen(false);
-              setEditMode(false);
-            }}
-          >
-            <FontAwesomeIcon icon={faArrowRotateLeft} />
-          </li>
-        </ul>
-      ) : (
-        <button onClick={() => setModalOpen(true)}>
-          <FontAwesomeIcon icon={faEllipsis} />
-        </button>
-      )}
+      <EditRemoveBox
+        onEdit={onNewProjectNameSubmit}
+        onInputChange={onInputChange}
+        inputValue={newProjectName || projectName}
+        text={projectName}
+        onDelete={onDelete}
+        link={`/project/${projectId}`}
+      />
     </Container>
   );
 }

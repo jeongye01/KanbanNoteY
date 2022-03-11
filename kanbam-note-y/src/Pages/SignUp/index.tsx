@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Container, Wrapper, Logo, Form, Submit, Error, LinkMessage } from './styles';
+import { Container, Wrapper, Logo, Form, Submit, Error, LinkMessage, Body } from './styles';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { db, createUser } from '../../firebase';
 import { useHistory } from 'react-router-dom';

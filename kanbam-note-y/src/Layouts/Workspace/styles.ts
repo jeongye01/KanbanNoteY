@@ -124,8 +124,8 @@ export const WorkspaceName = styled.button`
   border: none;
   width: 100%;
   text-align: left;
-  border-top: 1px solid ${(props) => props.theme.innerbgColor};
-  border-bottom: 1px solid ${(props) => props.theme.innerbgColor};
+  border-top: 1px solid white;
+  border-bottom: 1px solid white;
   font-weight: 900;
   font-size: 24px;
   background: transparent;
@@ -178,10 +178,8 @@ export const WorkspaceModal = styled.div`
 `;
 
 export const Chats = styled.div`
-  //width: calc(100vw-260px);
   overflow-x: scroll;
-  padding: 15px;
-  margin-left: 100px;
+  padding: 3px;
 `;
 
 export const AddButton = styled.button`

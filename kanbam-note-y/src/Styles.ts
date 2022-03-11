@@ -11,6 +11,7 @@ const GlobalStyle = createGlobalStyle`
   body{
     font-family: 'Source Sans Pro', sans-serif;
     background-color:${(props) => props.theme.innerbgColor};
+    //${(props) => props.theme.innerbgColor};
     color:${(props) => props.theme.textColor};
     font-size:16px;
   }
@@ -18,12 +19,16 @@ const GlobalStyle = createGlobalStyle`
     text-decoration:none;
     color:inherit;
   }
+  button{
+    all:unset;
+  }
 `;
 
 export const theme: DefaultTheme = {
-  outerbgColor: '#93D42E',
-  innerbgColor: '#FAFAFA',
+  outerbgColor: '#A3CB38',
+  innerbgColor: '#fafafa',
   textColor: 'black',
   accentColor: '#93D42E',
+  buttonColor: '#ffc312',
 };
 export default GlobalStyle;

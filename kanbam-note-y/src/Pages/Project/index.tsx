@@ -11,9 +11,6 @@ import { db } from '../../firebase';
 import { useParams } from 'react-router-dom';
 import { IboardsOrder, IProject } from '../../Typings/db';
 const Container = styled.div`
-  margin: 8px;
-
-  border: 1px solid lightgrey;
   display: flex;
 `;
 
