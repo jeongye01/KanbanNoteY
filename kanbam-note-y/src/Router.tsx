@@ -16,6 +16,7 @@ function Router() {
   const [loggedIn, setIsLoggedIn] = useRecoilState(isLoggedIn);
   const setUser = useSetRecoilState(userState);
   onAuthStateChanged(auth, async (user) => {
+    console.log(user);
     if (user?.email) {
       const docRef = doc(db, 'users', user?.email);
       const docSnap = await getDoc(docRef);
