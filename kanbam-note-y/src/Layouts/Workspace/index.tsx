@@ -42,7 +42,11 @@ const Workspace = () => {
   const [boardsOrder, setBoardsOrder] = useRecoilState(boardsOrderState);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showAddProjectModal, setShowAddProjectModal] = useState(false);
-
+  useEffect(() => {
+    if (!projectId) {
+      history.push(`/project/${user.projects[0].id}`);
+    }
+  }, [projectId]);
   return (
     <div>
       <Header>

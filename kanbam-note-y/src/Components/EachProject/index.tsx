@@ -1,6 +1,6 @@
 import React, { useEffect, useState, VFC } from 'react';
 import { useParams } from 'react-router';
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink, useLocation, useHistory } from 'react-router-dom';
 import { db } from '../../firebase';
 import { IProject, IUser } from '../../Typings/db';
 import { boardsOrderState, projectState } from '../../Atoms/project';
@@ -32,6 +32,8 @@ const Container = styled.div`
 `;
 
 function EachProject({ projectId, projectName }: Props) {
+  const history = useHistory();
+  const { projectId: urlProject } = useParams<{ projectId: string }>();
   const [newProjectName, setNewProjectName] = useState('');
   const [user, setUser] = useRecoilState<IUser>(userState);
   const onNewProjectNameSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -69,6 +71,7 @@ function EachProject({ projectId, projectName }: Props) {
       updateUser(updatedUser);
       return updatedUser;
     });
+    if (urlProject === projectId) history.push('/');
   };
   const updateUser = async (userInfo: IUser) => {
     await setDoc(doc(db, 'users', user.email), {

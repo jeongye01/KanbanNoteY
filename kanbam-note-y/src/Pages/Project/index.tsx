@@ -52,7 +52,7 @@ const AddBoardSubmit = styled.input`
 
   background-color: orange;
   font-size: 18px;
-
+  cursor: pointer;
   border-top-right-radius: 10px;
   border-bottom-right-radius: 10px;
 `;

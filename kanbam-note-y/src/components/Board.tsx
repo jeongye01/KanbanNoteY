@@ -29,6 +29,8 @@ const Container = styled.div`
   align-items: center;
   background-color: white;
   padding: 5px;
+  overflow: hidden;
+  height: max-content;
   div {
     display: flex;
   }
@@ -46,6 +48,7 @@ const TaskList = styled.ul<{ isDraggingOver: boolean }>`
   background-color: ${(props) => (props.isDraggingOver ? 'skyblue' : 'white')};
   width: 275px;
   min-height: 100px;
+  flex-grow: 1;
 `;
 
 const Add = styled.button`
