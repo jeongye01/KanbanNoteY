@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 import { EventHandler } from 'react';
+import Input from './Input';
 import {
   faEllipsis,
   faPenToSquare,
@@ -27,7 +28,7 @@ const Container = styled.div`
     }
   }
 `;
-const Title = styled.span``;
+
 interface Props {
   onEdit: (event: React.FormEvent<HTMLFormElement>) => void;
   onInputChange: (event: React.FormEvent<HTMLInputElement>) => void;
@@ -40,25 +41,23 @@ interface Props {
 function EditRemoveBox({ onEdit, onInputChange, inputValue, text, onDelete, link }: Props) {
   const [ellipsisClicked, setEllipsisClicked] = useState(false);
   const [editMode, setEditMode] = useState(false);
-  const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    onEdit(event);
+  const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    await onEdit(event);
     setEllipsisClicked(false);
     setEditMode(false);
   };
   return (
     <Container>
       {ellipsisClicked && editMode ? (
-        <form onSubmit={onSubmit}>
-          <input onChange={onInputChange} type="text" value={inputValue} required />
-        </form>
+        <Input onChange={onInputChange} onSubmit={onSubmit} value={inputValue} placeholder={text} />
       ) : (
         <>
           {link ? (
             <NavLink activeClassName="selected" to={link}>
-              <Title>{text}</Title>
+              <span>{text}</span>
             </NavLink>
           ) : (
-            <Title>{text}</Title>
+            <span>{text}</span>
           )}
         </>
       )}
@@ -69,8 +68,8 @@ function EditRemoveBox({ onEdit, onInputChange, inputValue, text, onDelete, link
             <FontAwesomeIcon icon={faPenSquare} />
           </li>
           <li
-            onClick={() => {
-              onDelete();
+            onClick={async () => {
+              await onDelete();
               setEllipsisClicked(false);
             }}
           >

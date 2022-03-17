@@ -14,39 +14,79 @@ const Container = styled.div`
   display: flex;
 `;
 
+const AddBoard = styled.form`
+  margin-top: 10px;
+  display: block;
+  width: 270px;
+  min-width: 270px;
+  height: 62px;
+  border: 0;
+  background-color: ${(props) => props.theme.outerbgColor};
+  border-bottom-left-radius: 41px;
+  border-bottom-right-radius: 41px;
+  border-top-left-radius: 41px;
+  border-top-right-radius: 0;
+  box-shadow: 0 17px 40px 0 rgba(75, 128, 182, 0.07);
+  margin-bottom: 22px;
+  font-size: 17px;
+  color: #a7b4c1;
+  transition: opacity 0.2s ease-in-out, filter 0.2s ease-in-out, box-shadow 0.1s ease-in-out;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 5px;
+  input {
+    height: 25px;
+  }
+`;
+const AddBoardInput = styled.input`
+  border: 2px solid black;
+  padding-left: 10px;
+  font-size: 15px;
+  border-right: none;
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+`;
+const AddBoardSubmit = styled.input`
+  border: 2px solid black;
+
+  background-color: orange;
+  font-size: 18px;
+
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+`;
 function Project() {
   const { projectId } = useParams<{ projectId?: string }>();
   const [project, setProject] = useRecoilState(projectState);
   const [boardsOrder, setBoardsOrder] = useRecoilState(boardsOrderState);
   const [newBoardName, setNewBoardName] = useState<string>('');
 
-  const user = useRecoilValue(userState);
   console.log(boardsOrder, project, 'init');
-
-  const onProjectNameSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-  };
 
   const onNewBoardSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const id = Date.now();
+    if (newBoardName) {
+      const id = Date.now();
 
-    setProject((prev) => {
-      console.log(id);
-      const newProject = {
-        ...prev,
-        contents: { ...prev.contents, [`${id}`]: { name: newBoardName, tasks: [] } },
-      };
-      updateProject(newProject);
-      return newProject;
-    });
+      setProject((prev) => {
+        console.log(id);
+        const newProject = {
+          ...prev,
+          contents: { ...prev.contents, [`${id}`]: { name: newBoardName, tasks: [] } },
+        };
+        updateProject(newProject);
+        return newProject;
+      });
 
-    setBoardsOrder((prev) => {
-      console.log(id);
-      const newBoardsOrder = { ...prev, order: [...prev.order, id.toString()] };
-      updateBoardsOrder(newBoardsOrder);
-      return newBoardsOrder;
-    });
+      setBoardsOrder((prev) => {
+        console.log(id);
+        const newBoardsOrder = { ...prev, order: [...prev.order, id.toString()] };
+        updateBoardsOrder(newBoardsOrder);
+        return newBoardsOrder;
+      });
+      setNewBoardName('');
+    }
   };
 
   const updateProject = async (newProject: IProject) => {
@@ -163,10 +203,17 @@ function Project() {
               )}
             </Droppable>
           </DragDropContext>
-          <form onSubmit={onNewBoardSubmit}>
-            <input onChange={onNewBoardChange} name="newBoard" type="text" placeholder="Enter list title..." />
-            <input type="submit" value="Add list" />
-          </form>
+          <AddBoard onSubmit={onNewBoardSubmit}>
+            <AddBoardInput
+              onChange={onNewBoardChange}
+              value={newBoardName}
+              name="newBoard"
+              type="text"
+              placeholder="보드 추가"
+            />
+            <AddBoardSubmit type="submit" value="+" />
+            <span>👻</span>
+          </AddBoard>
         </Container>
       ) : null}
     </>

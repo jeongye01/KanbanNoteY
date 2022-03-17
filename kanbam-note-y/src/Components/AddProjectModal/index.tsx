@@ -9,26 +9,15 @@ import { doc, setDoc } from 'firebase/firestore';
 import { nanoid } from 'nanoid';
 import { defaultProjectContents, defaultBoardsOrder, IUser } from '../../Typings/db';
 import styled from 'styled-components';
-
+import Input from '../Input';
 const Container = styled.div`
   min-width: 160px;
-`;
-
-const Form = styled.form`
   padding: 10px;
-
   h1 {
-    margin-bottom: 15px;
+    margin-bottom: 10px;
   }
   input {
-    color: #322d39;
-    outline: none;
     padding: 0.3rem;
-    border: 2px solid ${(props) => props.theme.accentColor};
-
-    &:focus {
-      border-color: orange;
-    }
   }
 `;
 
@@ -43,16 +32,18 @@ function AddProjectModal() {
   const [user, setUser] = useRecoilState<IUser>(userState);
 
   const onSubmit = async (event: React.SyntheticEvent) => {
-    event.preventDefault();
-    const id = nanoid();
-    setUser((prev) => {
-      updateUser(id);
-      createProject(id);
-      createBoardsOrder(id);
-      return { ...prev, projects: [...prev.projects, { name: newProject, id }] };
-    });
-    setNewProject('');
-    console.log('add project', user);
+    if (newProject) {
+      event.preventDefault();
+      const id = nanoid();
+      setUser((prev) => {
+        updateUser(id);
+        createProject(id);
+        createBoardsOrder(id);
+        return { ...prev, projects: [...prev.projects, { name: newProject, id }] };
+      });
+      setNewProject('');
+      console.log('add project', user);
+    }
   };
   const onChange = (event: React.FormEvent<HTMLInputElement>) => {
     setNewProject(event.currentTarget.value);
@@ -81,10 +72,8 @@ function AddProjectModal() {
   };
   return (
     <Container>
-      <Form onSubmit={onSubmit}>
-        <h1>New Project 😀</h1>
-        <input name="board-title" type="text" value={newProject} onChange={onChange} />
-      </Form>
+      <h1>New Project 😀</h1>
+      <Input onChange={onChange} onSubmit={onSubmit} value={newProject} />
     </Container>
   );
 }

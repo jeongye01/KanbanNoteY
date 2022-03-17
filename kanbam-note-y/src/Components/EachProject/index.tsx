@@ -36,27 +36,29 @@ function EachProject({ projectId, projectName }: Props) {
   const [user, setUser] = useRecoilState<IUser>(userState);
   const onNewProjectNameSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const docRef = doc(db, 'projects', projectId);
-    const docSnap = await getDoc(docRef);
+    if (newProjectName) {
+      const docRef = doc(db, 'projects', projectId);
+      const docSnap = await getDoc(docRef);
 
-    if (docSnap.exists()) {
-      const data = docSnap.data();
-      const updatedProject = { ...data, name: newProjectName };
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        const updatedProject = { ...data, name: newProjectName };
 
-      await setDoc(doc(db, 'projects', projectId), {
-        ...updatedProject,
-      });
-      setUser((prev) => {
-        const newUserProjects = prev?.projects?.map((project) => {
-          if (project.id === projectId) {
-            return { ...project, name: newProjectName };
-          }
-          return project;
+        await setDoc(doc(db, 'projects', projectId), {
+          ...updatedProject,
         });
-        const updatedUser = { ...prev, projects: newUserProjects };
-        updateUser(updatedUser);
-        return updatedUser;
-      });
+        setUser((prev) => {
+          const newUserProjects = prev?.projects?.map((project) => {
+            if (project.id === projectId) {
+              return { ...project, name: newProjectName };
+            }
+            return project;
+          });
+          const updatedUser = { ...prev, projects: newUserProjects };
+          updateUser(updatedUser);
+          return updatedUser;
+        });
+      }
     }
   };
   const onDelete = async () => {
@@ -79,7 +81,7 @@ function EachProject({ projectId, projectName }: Props) {
       <EditRemoveBox
         onEdit={onNewProjectNameSubmit}
         onInputChange={onInputChange}
-        inputValue={newProjectName || projectName}
+        inputValue={newProjectName}
         text={projectName}
         onDelete={onDelete}
         link={`/project/${projectId}`}

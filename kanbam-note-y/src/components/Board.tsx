@@ -7,6 +7,7 @@ import {
   faTrashCan,
   faPenSquare,
   faArrowRotateLeft,
+  faX,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { boardsOrderState, projectState } from '../Atoms/project';
@@ -18,6 +19,7 @@ import { doc, setDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import { useParams } from 'react-router-dom';
 import EditRemoveBox from './EditRemoveBox';
+import Input from './Input';
 const Container = styled.div`
   margin: 8px;
   border: 1px solid lightgrey;
@@ -27,8 +29,17 @@ const Container = styled.div`
   align-items: center;
   background-color: white;
   padding: 5px;
+  div {
+    display: flex;
+  }
+  form {
+    margin-right: 15px;
+  }
+  button {
+    opacity: 0.5;
+  }
 `;
-const Title = styled.span``;
+
 const TaskList = styled.ul<{ isDraggingOver: boolean }>`
   padding: 8px;
   transition: background-color 0.2s ease;
@@ -43,13 +54,16 @@ const Add = styled.button`
 const Header = styled.header`
   width: 100%;
   padding: 0 5px;
+  span {
+    font-weight: 600;
+  }
   button,
   ul {
     color: ${(props) => props.theme.buttonColor};
   }
   margin-bottom: 5px;
 `;
-const Modal = styled.div``;
+
 interface Iprops {
   boardKey: string;
   board: IboardInfo;
@@ -69,19 +83,21 @@ function Board({ board, boardKey, index }: Iprops) {
   const onTaskSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    setProject((prev) => {
-      const newTaskObj = { id: Date.now(), content: newTask };
-      const newTasks = [...prev.contents[`${boardKey}`].tasks, newTaskObj];
-      const newProject = {
-        ...prev,
-        contents: { ...prev.contents, [`${boardKey}`]: { name: board.name, tasks: newTasks } },
-      };
-      updateProject(project.id, newProject);
+    if (newTask) {
+      setProject((prev) => {
+        const newTaskObj = { id: Date.now(), content: newTask };
+        const newTasks = [...prev.contents[`${boardKey}`].tasks, newTaskObj];
+        const newProject = {
+          ...prev,
+          contents: { ...prev.contents, [`${boardKey}`]: { name: board.name, tasks: newTasks } },
+        };
+        updateProject(project.id, newProject);
 
-      return newProject;
-    });
+        return newProject;
+      });
 
-    setNewTask('');
+      setNewTask('');
+    }
   };
   const updateProject = async (id: string, newProject: IProject) => {
     -(await setDoc(doc(db, 'projects', id), {
@@ -158,11 +174,13 @@ function Board({ board, boardKey, index }: Iprops) {
                   )}
                 </Droppable>
                 {isNewTaskActive ? (
-                  <form onSubmit={onTaskSubmit}>
-                    <input type="text" onChange={onTaskChanged} value={newTask} placeholder="이름을 입력하세요." />
-                    <input type="submit" value="할 일 추가" />
-                    <button onClick={() => setIsNewTaskActive(false)}>x</button>
-                  </form>
+                  <div>
+                    <Input onSubmit={onTaskSubmit} onChange={onTaskChanged} value={newTask} placeholder="할 일 추가" />
+
+                    <button onClick={() => setIsNewTaskActive(false)}>
+                      <FontAwesomeIcon icon={faX} size="sm" />
+                    </button>
+                  </div>
                 ) : (
                   <Add onClick={() => setIsNewTaskActive(true)}>+ 새로 만들기</Add>
                 )}

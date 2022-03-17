@@ -9,12 +9,20 @@ import { userState } from '../Atoms/user';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { doc, setDoc } from 'firebase/firestore';
 import { db } from '../firebase';
+import Input from './Input';
+import EditRemoveBox from './EditRemoveBox';
 const List = styled.li<{ isDragging: boolean }>`
   border: 1px solid lightgrey;
   border-radius: 2px;
   padding: 8px;
   margin-bottom: 8px;
   background-color: ${(props) => (props.isDragging ? 'lightGreen' : 'white')};
+  li {
+    opacity: 0.5;
+  }
+  input {
+    padding: 2px;
+  }
 `;
 
 interface Iprops {
@@ -24,29 +32,26 @@ interface Iprops {
 }
 function Task({ boardKey, task, idx }: Iprops) {
   const [updatedTaskName, setUpdatedTaskName] = useState<string>(task.content);
-  const [isEditActive, setIsEditActive] = useState<boolean>(false);
-
   const [project, setProject] = useRecoilState(projectState);
-  const user = useRecoilValue(userState);
 
   const onTaskSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    setProject((prev) => {
-      const copyBoard = { ...prev.contents[boardKey] };
-      const copyTasks = [...copyBoard.tasks];
-      const { id } = copyTasks[idx];
-      copyTasks.splice(idx, 0, { id, content: updatedTaskName });
-      copyTasks.splice(idx + 1, 1);
-      const newProject = {
-        ...prev,
-        contents: { ...prev.contents, [`${boardKey}`]: { name: copyBoard.name, tasks: copyTasks } },
-      };
-      updateProject(project.id, newProject);
-      return newProject;
-    });
-
-    setIsEditActive(false);
+    if (updatedTaskName) {
+      setProject((prev) => {
+        const copyBoard = { ...prev.contents[boardKey] };
+        const copyTasks = [...copyBoard.tasks];
+        const { id } = copyTasks[idx];
+        copyTasks.splice(idx, 0, { id, content: updatedTaskName });
+        copyTasks.splice(idx + 1, 1);
+        const newProject = {
+          ...prev,
+          contents: { ...prev.contents, [`${boardKey}`]: { name: copyBoard.name, tasks: copyTasks } },
+        };
+        updateProject(project.id, newProject);
+        return newProject;
+      });
+    }
   };
   const updateProject = async (id: string, newProject: IProject) => {
     await setDoc(doc(db, 'projects', id), {
@@ -81,22 +86,13 @@ function Task({ boardKey, task, idx }: Iprops) {
           {...provided.draggableProps}
           isDragging={snapshot.isDragging}
         >
-          {isEditActive ? (
-            <form onSubmit={onTaskSubmit}>
-              <input onChange={onTaskChanged} type="text" value={updatedTaskName} />
-              <input type="submit" value="저장" />
-            </form>
-          ) : (
-            <>
-              <span>🔥{task.content}</span>
-              <button onClick={() => setIsEditActive(true)}>
-                <FontAwesomeIcon icon={faPenToSquare} />
-              </button>
-              <button onClick={onTaskDelete}>
-                <FontAwesomeIcon icon={faTrashCan} />
-              </button>
-            </>
-          )}
+          <EditRemoveBox
+            onEdit={onTaskSubmit}
+            onInputChange={onTaskChanged}
+            inputValue={updatedTaskName}
+            text={task.content}
+            onDelete={onTaskDelete}
+          />
         </List>
       )}
     </Draggable>
