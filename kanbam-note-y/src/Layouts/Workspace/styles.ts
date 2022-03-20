@@ -177,7 +177,7 @@ export const WorkspaceModal = styled.div`
   }
 `;
 
-export const Chats = styled.div`
+export const MainView = styled.div`
   overflow-x: scroll;
   padding: 3px;
 `;

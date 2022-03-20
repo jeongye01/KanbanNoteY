@@ -1,4 +1,4 @@
-import { atom, selector, useRecoilValue } from 'recoil';
+import { atom } from 'recoil';
 import { IUser } from '../Typings/db';
 
 export const userState = atom<IUser>({

@@ -11,6 +11,7 @@ interface Props {
 }
 
 const Menu = ({ closeButton, style, show, children, onCloseModal }: Props) => {
+  console.log('Menu');
   const stopPropagation = useCallback((e) => {
     e.stopPropagation();
   }, []);
@@ -28,4 +29,4 @@ const Menu = ({ closeButton, style, show, children, onCloseModal }: Props) => {
   );
 };
 
-export default Menu;
+export default React.memo(Menu);

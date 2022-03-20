@@ -1,17 +1,5 @@
-import { useState } from 'react';
-import styled from 'styled-components';
-const Form = styled.form`
-  input {
-    color: #322d39;
-    outline: none;
-    padding: 0.3rem;
-    border: 2px solid ${(props) => props.theme.accentColor};
-
-    &:focus {
-      border-color: orange;
-    }
-  }
-`;
+import React from 'react';
+import { Form } from './styles';
 interface Props {
   onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
   onChange: (event: React.FormEvent<HTMLInputElement>) => void;
@@ -19,6 +7,7 @@ interface Props {
   placeholder?: string;
 }
 function Input({ onSubmit, onChange, value, placeholder }: Props) {
+  console.log('Input');
   return (
     <Form onSubmit={onSubmit}>
       <input type="text" value={value} onChange={onChange} placeholder={placeholder} />
@@ -26,4 +15,4 @@ function Input({ onSubmit, onChange, value, placeholder }: Props) {
   );
 }
 
-export default Input;
+export default React.memo(Input);

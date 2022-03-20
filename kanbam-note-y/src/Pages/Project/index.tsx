@@ -1,93 +1,48 @@
-import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd';
+import { DragDropContext, Droppable, DropResult } from 'react-beautiful-dnd';
 import { boardsOrderState, projectState } from '../../Atoms/project';
-import { userState } from '../../Atoms/user';
-import { useRecoilState, useRecoilValue, useResetRecoilState } from 'recoil';
-import { useEffect, useState } from 'react';
-import Workspace from '../../Layouts/Workspace';
-import styled from 'styled-components';
+import { useRecoilState } from 'recoil';
+import { useCallback, useEffect, useState } from 'react';
 import Board from '../../Components/Board';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { useParams } from 'react-router-dom';
 import { IboardsOrder, IProject } from '../../Typings/db';
-const Container = styled.div`
-  display: flex;
-`;
-
-const AddBoard = styled.form`
-  margin-top: 10px;
-  display: block;
-  width: 270px;
-  min-width: 270px;
-  height: 62px;
-  border: 0;
-  background-color: ${(props) => props.theme.outerbgColor};
-  border-bottom-left-radius: 41px;
-  border-bottom-right-radius: 41px;
-  border-top-left-radius: 41px;
-  border-top-right-radius: 0;
-  box-shadow: 0 17px 40px 0 rgba(75, 128, 182, 0.07);
-  margin-bottom: 22px;
-  font-size: 17px;
-  color: #a7b4c1;
-  transition: opacity 0.2s ease-in-out, filter 0.2s ease-in-out, box-shadow 0.1s ease-in-out;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 5px;
-  input {
-    height: 25px;
-  }
-`;
-const AddBoardInput = styled.input`
-  border: 2px solid black;
-  padding-left: 10px;
-  font-size: 15px;
-  border-right: none;
-  border-top-left-radius: 10px;
-  border-bottom-left-radius: 10px;
-`;
-const AddBoardSubmit = styled.input`
-  border: 2px solid black;
-
-  background-color: orange;
-  font-size: 18px;
-  cursor: pointer;
-  border-top-right-radius: 10px;
-  border-bottom-right-radius: 10px;
-`;
+import { Container, AddBoard, AddBoardInput, AddBoardSubmit } from './styles';
 function Project() {
   const { projectId } = useParams<{ projectId?: string }>();
   const [project, setProject] = useRecoilState(projectState);
   const [boardsOrder, setBoardsOrder] = useRecoilState(boardsOrderState);
   const [newBoardName, setNewBoardName] = useState<string>('');
 
-  console.log(boardsOrder, project, 'init');
+  console.log('Project');
 
-  const onNewBoardSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    if (newBoardName) {
-      const id = Date.now();
+  const onNewBoardSubmit = useCallback(
+    async (event: React.FormEvent<HTMLFormElement>) => {
+      event.preventDefault();
+      if (newBoardName) {
+        const id = Date.now();
 
-      setProject((prev) => {
-        console.log(id);
-        const newProject = {
-          ...prev,
-          contents: { ...prev.contents, [`${id}`]: { name: newBoardName, tasks: [] } },
-        };
-        updateProject(newProject);
-        return newProject;
-      });
+        setProject((prev) => {
+          console.log(id);
+          const newProject = {
+            ...prev,
+            contents: { ...prev.contents, [`${id}`]: { name: newBoardName, tasks: [] } },
+          };
+          updateProject(newProject);
+          return newProject;
+        });
 
-      setBoardsOrder((prev) => {
-        console.log(id);
-        const newBoardsOrder = { ...prev, order: [...prev.order, id.toString()] };
-        updateBoardsOrder(newBoardsOrder);
-        return newBoardsOrder;
-      });
-      setNewBoardName('');
-    }
-  };
+        setBoardsOrder((prev) => {
+          console.log(id);
+          const newBoardsOrder = { ...prev, order: [...prev.order, id.toString()] };
+          updateBoardsOrder(newBoardsOrder);
+          return newBoardsOrder;
+        });
+        setNewBoardName('');
+      }
+    },
+    [newBoardName],
+  );
 
   const updateProject = async (newProject: IProject) => {
     if (projectId) {
@@ -103,9 +58,9 @@ function Project() {
       });
     }
   };
-  const onNewBoardChange = (event: React.FormEvent<HTMLInputElement>) => {
+  const onNewBoardChange = useCallback((event: React.FormEvent<HTMLInputElement>) => {
     setNewBoardName(event.currentTarget.value);
-  };
+  }, []);
   const onDragEnd = async (result: DropResult) => {
     const { destination, draggableId, source, type } = result;
     console.log(destination, source);
@@ -189,33 +144,39 @@ function Project() {
   }, [projectId]);
   return (
     <>
-      {project.id === boardsOrder.projectId ? (
-        <Container>
-          <DragDropContext onDragEnd={onDragEnd}>
-            <Droppable droppableId="all-boards" direction="horizontal" type="column">
-              {(provided) => (
-                <Container {...provided.droppableProps} ref={provided.innerRef}>
-                  {boardsOrder?.order?.map((boardId, index) => (
-                    <Board board={project.contents[boardId]} key={boardId} boardKey={boardId} index={index} />
-                  ))}
-                  {provided.placeholder}
-                </Container>
-              )}
-            </Droppable>
-          </DragDropContext>
-          <AddBoard onSubmit={onNewBoardSubmit}>
-            <AddBoardInput
-              onChange={onNewBoardChange}
-              value={newBoardName}
-              name="newBoard"
-              type="text"
-              placeholder="보드 추가"
-            />
-            <AddBoardSubmit type="submit" value="+" />
-            <span>👻</span>
-          </AddBoard>
-        </Container>
-      ) : null}
+      {projectId ? (
+        <>
+          {project.id === boardsOrder.projectId ? (
+            <Container>
+              <DragDropContext onDragEnd={onDragEnd}>
+                <Droppable droppableId="all-boards" direction="horizontal" type="column">
+                  {(provided) => (
+                    <Container {...provided.droppableProps} ref={provided.innerRef}>
+                      {boardsOrder?.order?.map((boardId, index) => (
+                        <Board board={project.contents[boardId]} key={boardId} boardKey={boardId} index={index} />
+                      ))}
+                      {provided.placeholder}
+                    </Container>
+                  )}
+                </Droppable>
+              </DragDropContext>
+              <AddBoard onSubmit={onNewBoardSubmit}>
+                <AddBoardInput
+                  onChange={onNewBoardChange}
+                  value={newBoardName}
+                  name="newBoard"
+                  type="text"
+                  placeholder="보드 추가"
+                />
+                <AddBoardSubmit type="submit" value="+" />
+                <span>👻</span>
+              </AddBoard>
+            </Container>
+          ) : null}
+        </>
+      ) : (
+        <span>&larr;프로젝트를 추가해 주세요!</span>
+      )}
     </>
   );
 }

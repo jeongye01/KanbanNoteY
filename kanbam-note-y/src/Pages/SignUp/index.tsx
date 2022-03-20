@@ -12,6 +12,7 @@ interface IFormInputs {
   password_check: string;
 }
 function Signup() {
+  console.log('Signup');
   const history = useHistory();
   const [fail, setFail] = useState(false);
   const {

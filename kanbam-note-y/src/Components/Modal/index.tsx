@@ -1,11 +1,12 @@
 import { CreateModal, CloseModalButton } from './styles';
 
-import React, { useCallback } from 'react';
+import React from 'react';
 
 interface Props {
   children: React.ReactNode;
 }
 const Modal = ({ children }: Props) => {
+  console.log('Modal');
   return (
     <CreateModal>
       <div>
@@ -16,4 +17,4 @@ const Modal = ({ children }: Props) => {
   );
 };
 
-export default Modal;
+export default React.memo(Modal);

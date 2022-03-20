@@ -1,33 +1,10 @@
-import styled from 'styled-components';
-import { EventHandler } from 'react';
-import Input from './Input';
-import {
-  faEllipsis,
-  faPenToSquare,
-  faTrashCan,
-  faPenSquare,
-  faArrowRotateLeft,
-} from '@fortawesome/free-solid-svg-icons';
+import React, { useCallback } from 'react';
+import Input from '../Input';
+import { faEllipsis, faTrashCan, faPenSquare, faArrowRotateLeft } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
-
-const Container = styled.div`
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  button {
-  }
-  ul {
-    display: flex;
-    align-items: center;
-
-    li {
-      margin-left: 5px;
-    }
-  }
-`;
+import { Container } from './styles';
 
 interface Props {
   onEdit: (event: React.FormEvent<HTMLFormElement>) => void;
@@ -39,6 +16,7 @@ interface Props {
 }
 
 function EditRemoveBox({ onEdit, onInputChange, inputValue, text, onDelete, link }: Props) {
+  console.log('EditRemoveBox');
   const [ellipsisClicked, setEllipsisClicked] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -94,4 +72,4 @@ function EditRemoveBox({ onEdit, onInputChange, inputValue, text, onDelete, link
   );
 }
 
-export default EditRemoveBox;
+export default React.memo(EditRemoveBox);

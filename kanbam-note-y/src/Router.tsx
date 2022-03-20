@@ -1,13 +1,10 @@
 import { Switch, BrowserRouter, Route, Redirect } from 'react-router-dom';
-
-import React, { useEffect, useState } from 'react';
-
 import Login from './Pages/Login';
 import SignUp from './Pages/SignUp';
-import Workspace from './Layouts/Workspace';
+import Home from './Pages/Home';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from './firebase';
-import { userLogin, db } from './firebase';
+import { db } from './firebase';
 import { doc, getDoc } from 'firebase/firestore';
 import { useSetRecoilState } from 'recoil';
 import { userState, isLoggedIn } from './Atoms/user';
@@ -17,6 +14,10 @@ function Router() {
   const setUser = useSetRecoilState(userState);
   onAuthStateChanged(auth, async (user) => {
     console.log(user);
+    if (!user) {
+      setIsLoggedIn(false);
+      return;
+    }
     if (user?.email) {
       const docRef = doc(db, 'users', user?.email);
       const docSnap = await getDoc(docRef);
@@ -34,7 +35,7 @@ function Router() {
     <BrowserRouter>
       <Switch>
         <Route exact path={['/', '/project/:projectId']}>
-          {loggedIn ? <Workspace /> : <Login />}
+          {loggedIn ? <Home /> : <Login />}
         </Route>
 
         <Route path="/signup" component={SignUp} />

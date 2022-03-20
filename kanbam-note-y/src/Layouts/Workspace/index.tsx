@@ -1,22 +1,17 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { Link, Redirect, Route, Switch, useHistory } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useHistory } from 'react-router-dom';
 import gravatar from 'gravatar';
-import { useRecoilValue, useRecoilState, useSetRecoilState } from 'recoil';
-import { userState, isLoggedIn } from '../../Atoms/user';
-import Project from '../../Pages/Project';
+import { useRecoilValue, useResetRecoilState } from 'recoil';
+import { userState } from '../../Atoms/user';
 import Menu from '../../Components/Menu';
-import Modal from '../../Components/Modal';
 import ProjectList from '../../Components/ProjectList';
 import AddProjectModal from '../../Components/AddProjectModal';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { db, auth, logout, userLogin } from '../../firebase';
+import { logout } from '../../firebase';
 import { useParams } from 'react-router-dom';
-import { IboardsOrder, IProject } from '../../Typings/db';
 import { projectState, boardsOrderState } from '../../Atoms/project';
 import {
-  AddButton,
   Channels,
-  Chats,
+  MainView,
   Header,
   LogOutButton,
   MenuScroll,
@@ -24,25 +19,25 @@ import {
   ProfileImg,
   ProfileModal,
   RightMenu,
-  WorkspaceButton,
-  WorkspaceModal,
   WorkspaceName,
-  Workspaces,
   WorkspaceWrapper,
 } from './styles';
 import { faCirclePlus, faCircleXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-
-const Workspace = () => {
+import { Helmet } from 'react-helmet';
+interface Props {
+  children: React.ReactNode;
+}
+const Workspace = ({ children }: Props) => {
+  console.log('Workspace');
   const history = useHistory();
   const user = useRecoilValue(userState);
-  const setIsLoggedIn = useSetRecoilState(isLoggedIn);
   const { projectId } = useParams<{ projectId?: string }>();
-  const [project, setProject] = useRecoilState(projectState);
-  const [boardsOrder, setBoardsOrder] = useRecoilState(boardsOrderState);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showAddProjectModal, setShowAddProjectModal] = useState(false);
-
+  const resetProject = useResetRecoilState(projectState);
+  const resetBoardOrder = useResetRecoilState(boardsOrderState);
+  const resetUser = useResetRecoilState(userState);
   useEffect(() => {
     if (!projectId) {
       if (!user.projects[0]) return;
@@ -51,6 +46,11 @@ const Workspace = () => {
   }, [projectId, user.projects]);
   return (
     <div>
+      <Helmet>
+        <title>Yanban</title>
+        <link rel="icon" type="image/png" href="favicon.ico" sizes="16x16" />
+        <meta name="description" content="kanban note" />
+      </Helmet>
       <Header>
         {true && (
           <RightMenu>
@@ -78,7 +78,10 @@ const Workspace = () => {
                 </ProfileModal>
                 <LogOutButton
                   onClick={() => {
-                    setIsLoggedIn(false);
+                    resetProject();
+                    resetBoardOrder();
+                    resetUser();
+                    history.push('/');
                     logout();
                   }}
                 >
@@ -117,22 +120,10 @@ const Workspace = () => {
             )}
           </MenuScroll>
         </Channels>
-        <Chats>
-          <Project />
-        </Chats>
+        <MainView>{children}</MainView>
       </WorkspaceWrapper>
     </div>
   );
 };
 
-export default Workspace;
-/*
-
-<CreateChannelModal
-        show={showCreateChannelModal}
-        onCloseModal={() => {
-          setShowCreateChannelModal(false);
-        }}
-        setShowCreateChannelModal={setShowCreateChannelModal}
-      />
-*/
+export default React.memo(Workspace);

@@ -1,22 +1,19 @@
-import styled from 'styled-components';
-import { useState, useRef } from 'react';
-import { Link, useHistory } from 'react-router-dom';
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Container, Wrapper, Logo, Form, Error, Submit, LinkMessage } from '../SignUp/styles';
 import { useForm, SubmitHandler } from 'react-hook-form';
-import { userLogin, db, user } from '../../firebase';
-import { onAuthStateChanged } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
-import { useSetRecoilState } from 'recoil';
-import { userState } from '../../Atoms/user';
+import { userLogin } from '../../firebase';
+
 interface IFormInputs {
   email: string;
   password: string;
 }
 
 function Login() {
-  const history = useHistory();
+  console.log('Login');
+
   const [fail, setFail] = useState(false);
-  const setUser = useSetRecoilState(userState);
+
   const {
     register,
     formState: { errors },

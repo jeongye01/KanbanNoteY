@@ -1,71 +1,16 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { Droppable, Draggable } from 'react-beautiful-dnd';
-import styled from 'styled-components';
-import {
-  faEllipsis,
-  faPenToSquare,
-  faTrashCan,
-  faPenSquare,
-  faArrowRotateLeft,
-  faX,
-} from '@fortawesome/free-solid-svg-icons';
+import { faX } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { boardsOrderState, projectState } from '../Atoms/project';
-import { userState } from '../Atoms/user';
-import { IboardInfo, IboardsOrder, IProject, Itask } from '../Typings/db';
-import Task from './Task';
-import { useSetRecoilState, useRecoilState, useRecoilValue } from 'recoil';
+import { boardsOrderState, projectState } from '../../Atoms/project';
+import { IboardInfo, IboardsOrder, IProject } from '../../Typings/db';
+import Task from '../Task';
+import { useSetRecoilState, useRecoilState } from 'recoil';
 import { doc, setDoc } from 'firebase/firestore';
-import { db } from '../firebase';
-import { useParams } from 'react-router-dom';
-import EditRemoveBox from './EditRemoveBox';
-import Input from './Input';
-const Container = styled.div`
-  margin: 8px;
-  border: 1px solid lightgrey;
-  border-radius: 8px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  background-color: white;
-  padding: 5px;
-  overflow: hidden;
-  height: max-content;
-  div {
-    display: flex;
-  }
-  form {
-    margin-right: 15px;
-  }
-  button {
-    opacity: 0.5;
-  }
-`;
-
-const TaskList = styled.ul<{ isDraggingOver: boolean }>`
-  padding: 8px;
-  transition: background-color 0.2s ease;
-  background-color: ${(props) => (props.isDraggingOver ? 'skyblue' : 'white')};
-  width: 275px;
-  min-height: 100px;
-  flex-grow: 1;
-`;
-
-const Add = styled.button`
-  opacity: 0.7;
-`;
-const Header = styled.header`
-  width: 100%;
-  padding: 0 5px;
-  span {
-    font-weight: 600;
-  }
-  button,
-  ul {
-    color: ${(props) => props.theme.buttonColor};
-  }
-  margin-bottom: 5px;
-`;
+import { db } from '../../firebase';
+import EditRemoveBox from '../EditRemoveBox';
+import Input from '../Input';
+import { Container, TaskList, Add, Header } from './styles';
 
 interface Iprops {
   boardKey: string;
@@ -73,35 +18,36 @@ interface Iprops {
   index: number;
 }
 function Board({ board, boardKey, index }: Iprops) {
-  const { projectId } = useParams<{ projectId?: string }>();
-  console.log(board);
+  console.log('Board');
 
   const [updatedBoardName, setUpdatedBoardName] = useState<string>(board.name);
   const [newTask, setNewTask] = useState<string>('');
   const [isNewTaskActive, setIsNewTaskActive] = useState<boolean>(false);
   const [project, setProject] = useRecoilState(projectState);
-  const [boardsOrder, setBoardsOrder] = useRecoilState(boardsOrderState);
-  const user = useRecoilValue(userState);
+  const setBoardsOrder = useSetRecoilState(boardsOrderState);
 
-  const onTaskSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const onTaskSubmit = useCallback(
+    async (event: React.FormEvent<HTMLFormElement>) => {
+      event.preventDefault();
 
-    if (newTask) {
-      setProject((prev) => {
-        const newTaskObj = { id: Date.now(), content: newTask };
-        const newTasks = [...prev.contents[`${boardKey}`].tasks, newTaskObj];
-        const newProject = {
-          ...prev,
-          contents: { ...prev.contents, [`${boardKey}`]: { name: board.name, tasks: newTasks } },
-        };
-        updateProject(project.id, newProject);
+      if (newTask) {
+        setProject((prev) => {
+          const newTaskObj = { id: Date.now(), content: newTask };
+          const newTasks = [...prev.contents[`${boardKey}`].tasks, newTaskObj];
+          const newProject = {
+            ...prev,
+            contents: { ...prev.contents, [`${boardKey}`]: { name: board.name, tasks: newTasks } },
+          };
+          updateProject(project.id, newProject);
 
-        return newProject;
-      });
+          return newProject;
+        });
 
-      setNewTask('');
-    }
-  };
+        setNewTask('');
+      }
+    },
+    [newTask],
+  );
   const updateProject = async (id: string, newProject: IProject) => {
     -(await setDoc(doc(db, 'projects', id), {
       ...newProject,
@@ -112,9 +58,9 @@ function Board({ board, boardKey, index }: Iprops) {
       ...newBoardsOrder,
     });
   };
-  const onTaskChanged = (event: React.FormEvent<HTMLInputElement>) => {
+  const onTaskChanged = useCallback((event: React.FormEvent<HTMLInputElement>) => {
     setNewTask(event.currentTarget.value);
-  };
+  }, []);
   const onDelete = async () => {
     setBoardsOrder((prev) => {
       const newOrder = [...prev.order];
@@ -131,20 +77,23 @@ function Board({ board, boardKey, index }: Iprops) {
       return newProject;
     });
   };
-  const onEditChange = (event: React.FormEvent<HTMLInputElement>) => {
+  const onEditChange = useCallback((event: React.FormEvent<HTMLInputElement>) => {
     setUpdatedBoardName(event.currentTarget.value);
-  };
-  const onEdit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setProject((prev) => {
-      let copyBoard = { ...prev.contents[`${boardKey}`] };
-      copyBoard['name'] = updatedBoardName;
+  }, []);
+  const onEdit = useCallback(
+    async (event: React.FormEvent<HTMLFormElement>) => {
+      event.preventDefault();
+      setProject((prev) => {
+        let copyBoard = { ...prev.contents[`${boardKey}`] };
+        copyBoard['name'] = updatedBoardName;
 
-      const newProject = { ...prev, contents: { ...prev.contents, [`${boardKey}`]: copyBoard } };
-      updateProject(project.id, newProject);
-      return newProject;
-    });
-  };
+        const newProject = { ...prev, contents: { ...prev.contents, [`${boardKey}`]: copyBoard } };
+        updateProject(project.id, newProject);
+        return newProject;
+      });
+    },
+    [updatedBoardName],
+  );
   return (
     <>
       {true ? (
