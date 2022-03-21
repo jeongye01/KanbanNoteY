@@ -1,4 +1,4 @@
-interface projects {
+export interface ProjectByNameAndId {
   name: string;
   id: string;
 }
@@ -6,7 +6,7 @@ export interface IUser {
   uid: string;
   name: string;
   email: string;
-  projects: projects[];
+  projects: ProjectByNameAndId[];
 }
 
 export interface Itask {

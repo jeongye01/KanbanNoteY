@@ -10,7 +10,7 @@ function ProjectList() {
     <>
       <div>
         {user?.projects.map((project) => (
-          <EachProject key={project.id} projectId={project.id} projectName={project.name} />
+          <EachProject key={project.id} project={project} />
         ))}
       </div>
     </>

@@ -2,21 +2,21 @@ import React, { useCallback, useState } from 'react';
 import { useParams } from 'react-router';
 import { useHistory } from 'react-router-dom';
 import { db } from '../../firebase';
-import { IUser } from '../../Typings/db';
+import { IUser, ProjectByNameAndId } from '../../Typings/db';
 import { useRecoilState } from 'recoil';
 import { doc, deleteDoc, setDoc, getDoc } from 'firebase/firestore';
 import { userState } from '../../Atoms/user';
 import EditRemoveBox from '../EditRemoveBox';
 import { Container } from './styles';
 interface Props {
-  projectId: string;
-  projectName: string;
+  project: ProjectByNameAndId;
 }
 
-function EachProject({ projectId, projectName }: Props) {
+function EachProject({ project }: Props) {
   console.log('EachProject');
+  const { id: projectId, name: projectName } = project;
   const history = useHistory();
-  const { projectId: urlProject } = useParams<{ projectId: string }>();
+  const { projectId: projectOnUrl } = useParams<{ projectId: string }>();
   const [newProjectName, setNewProjectName] = useState('');
   const [user, setUser] = useRecoilState<IUser>(userState);
   const onNewProjectNameSubmit = useCallback(
@@ -34,11 +34,11 @@ function EachProject({ projectId, projectName }: Props) {
             ...updatedProject,
           });
           setUser((prev) => {
-            const newUserProjects = prev?.projects?.map((project) => {
-              if (project.id === projectId) {
-                return { ...project, name: newProjectName };
+            const newUserProjects = prev?.projects?.map((prevProject) => {
+              if (prevProject.id === projectId) {
+                return { ...prevProject, name: newProjectName };
               }
-              return project;
+              return prevProject;
             });
             const updatedUser = { ...prev, projects: newUserProjects };
             updateUser(updatedUser);
@@ -52,13 +52,13 @@ function EachProject({ projectId, projectName }: Props) {
   const onDelete = async () => {
     await deleteDoc(doc(db, 'projects', projectId));
     await deleteDoc(doc(db, 'boardsOrders', projectId));
-    const projects = user?.projects?.filter((project) => project.id !== projectId);
+    const projects = user?.projects?.filter((prevProject) => prevProject.id !== projectId);
     setUser((prev) => {
       const updatedUser = { ...prev, projects };
       updateUser(updatedUser);
       return updatedUser;
     });
-    if (urlProject === projectId) history.push('/');
+    if (projectOnUrl === projectId) history.push('/');
   };
   const updateUser = async (userInfo: IUser) => {
     await setDoc(doc(db, 'users', user.email), {

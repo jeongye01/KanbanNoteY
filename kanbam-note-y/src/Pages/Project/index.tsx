@@ -6,14 +6,13 @@ import Board from '../../Components/Board';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { useParams } from 'react-router-dom';
-import { IboardsOrder, IProject } from '../../Typings/db';
+import { IboardInfo, IboardsOrder, IProject } from '../../Typings/db';
 import { Container, AddBoard, AddBoardInput, AddBoardSubmit } from './styles';
 function Project() {
   const { projectId } = useParams<{ projectId?: string }>();
   const [project, setProject] = useRecoilState(projectState);
   const [boardsOrder, setBoardsOrder] = useRecoilState(boardsOrderState);
   const [newBoardName, setNewBoardName] = useState<string>('');
-
   console.log('Project');
 
   const onNewBoardSubmit = useCallback(
@@ -142,6 +141,7 @@ function Project() {
       fetchProject(projectId);
     }
   }, [projectId]);
+
   return (
     <>
       {projectId ? (
@@ -152,9 +152,10 @@ function Project() {
                 <Droppable droppableId="all-boards" direction="horizontal" type="column">
                   {(provided) => (
                     <Container {...provided.droppableProps} ref={provided.innerRef}>
-                      {boardsOrder?.order?.map((boardId, index) => (
-                        <Board board={project.contents[boardId]} key={boardId} boardKey={boardId} index={index} />
-                      ))}
+                      {boardsOrder?.order?.map((boardId, index) => {
+                        const board = project.contents[boardId];
+                        return <Board board={board} key={boardId} boardKey={boardId} index={index} />;
+                      })}
                       {provided.placeholder}
                     </Container>
                   )}
@@ -182,3 +183,7 @@ function Project() {
 }
 
 export default Project;
+
+/*
+   <Board board={board} key={`${board.name}-${index}`} index={index} />
+*/
