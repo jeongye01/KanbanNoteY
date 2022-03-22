@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useHistory } from 'react-router-dom';
 import gravatar from 'gravatar';
 import { useRecoilValue, useResetRecoilState } from 'recoil';
@@ -38,6 +38,15 @@ const Workspace = ({ children }: Props) => {
   const resetProject = useResetRecoilState(projectState);
   const resetBoardOrder = useResetRecoilState(boardsOrderState);
   const resetUser = useResetRecoilState(userState);
+
+  const onClickUserMenu = useCallback(() => setShowUserMenu((prev) => !prev), []);
+  const onClickLogout = useCallback(() => {
+    resetProject();
+    resetBoardOrder();
+    resetUser();
+    history.push('/');
+    logout();
+  }, []);
   useEffect(() => {
     if (!projectId) {
       if (!user.projects[0]) return;
@@ -54,21 +63,11 @@ const Workspace = ({ children }: Props) => {
       <Header>
         {true && (
           <RightMenu>
-            <span
-              onClick={() => {
-                setShowUserMenu((prev) => !prev);
-              }}
-            >
+            <span onClick={onClickUserMenu}>
               <ProfileImg src={gravatar.url(user.email, { s: '28px', d: 'retro' })} alt={user.name} />
             </span>
             {showUserMenu && (
-              <Menu
-                style={{ right: 0, top: 38 }}
-                show={showUserMenu}
-                onCloseModal={() => {
-                  setShowUserMenu((prev) => !prev);
-                }}
-              >
+              <Menu style={{ right: 0, top: 38 }} show={showUserMenu} onCloseModal={onClickUserMenu}>
                 <ProfileModal>
                   <img src={gravatar.url(user.email, { s: '36px', d: 'retro' })} alt={user.name} />
                   <div>
@@ -76,17 +75,7 @@ const Workspace = ({ children }: Props) => {
                     <span id="profile-active">Active</span>
                   </div>
                 </ProfileModal>
-                <LogOutButton
-                  onClick={() => {
-                    resetProject();
-                    resetBoardOrder();
-                    resetUser();
-                    history.push('/');
-                    logout();
-                  }}
-                >
-                  로그아웃
-                </LogOutButton>
+                <LogOutButton onClick={onClickLogout}>로그아웃</LogOutButton>
               </Menu>
             )}
           </RightMenu>

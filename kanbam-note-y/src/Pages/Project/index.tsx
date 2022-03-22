@@ -18,27 +18,26 @@ function Project() {
   const onNewBoardSubmit = useCallback(
     async (event: React.FormEvent<HTMLFormElement>) => {
       event.preventDefault();
-      if (newBoardName) {
-        const id = Date.now();
+      if (!newBoardName || !newBoardName.trim()) return;
+      const id = Date.now();
 
-        setProject((prev) => {
-          console.log(id);
-          const newProject = {
-            ...prev,
-            contents: { ...prev.contents, [`${id}`]: { name: newBoardName, tasks: [] } },
-          };
-          updateProject(newProject);
-          return newProject;
-        });
+      setProject((prev) => {
+        console.log(id);
+        const newProject = {
+          ...prev,
+          contents: { ...prev.contents, [`${id}`]: { name: newBoardName, tasks: [] } },
+        };
+        updateProject(newProject);
+        return newProject;
+      });
 
-        setBoardsOrder((prev) => {
-          console.log(id);
-          const newBoardsOrder = { ...prev, order: [...prev.order, id.toString()] };
-          updateBoardsOrder(newBoardsOrder);
-          return newBoardsOrder;
-        });
-        setNewBoardName('');
-      }
+      setBoardsOrder((prev) => {
+        console.log(id);
+        const newBoardsOrder = { ...prev, order: [...prev.order, id.toString()] };
+        updateBoardsOrder(newBoardsOrder);
+        return newBoardsOrder;
+      });
+      setNewBoardName('');
     },
     [newBoardName],
   );

@@ -15,17 +15,17 @@ function AddProjectModal() {
 
   const onSubmit = useCallback(
     async (event: React.SyntheticEvent) => {
-      if (newProject) {
-        event.preventDefault();
-        const id = nanoid();
-        setUser((prev) => {
-          updateUser(id);
-          createProject(id);
-          createBoardsOrder(id);
-          return { ...prev, projects: [...prev.projects, { name: newProject, id }] };
-        });
-        setNewProject('');
-      }
+      event.preventDefault();
+      if (!newProject || !newProject.trim()) return;
+
+      const id = nanoid();
+      setUser((prev) => {
+        updateUser(id);
+        createProject(id);
+        createBoardsOrder(id);
+        return { ...prev, projects: [...prev.projects, { name: newProject, id }] };
+      });
+      setNewProject('');
     },
     [newProject],
   );

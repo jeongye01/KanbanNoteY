@@ -22,29 +22,30 @@ function EachProject({ project }: Props) {
   const onNewProjectNameSubmit = useCallback(
     async (event: React.FormEvent<HTMLFormElement>) => {
       event.preventDefault();
-      if (newProjectName) {
-        const docRef = doc(db, 'projects', projectId);
-        const docSnap = await getDoc(docRef);
+      if (!newProjectName || !newProjectName.trim()) return;
 
-        if (docSnap.exists()) {
-          const data = docSnap.data();
-          const updatedProject = { ...data, name: newProjectName };
+      console.log('trimtraim', newProjectName.trim());
+      const docRef = doc(db, 'projects', projectId);
+      const docSnap = await getDoc(docRef);
 
-          await setDoc(doc(db, 'projects', projectId), {
-            ...updatedProject,
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        const updatedProject = { ...data, name: newProjectName };
+
+        await setDoc(doc(db, 'projects', projectId), {
+          ...updatedProject,
+        });
+        setUser((prev) => {
+          const newUserProjects = prev?.projects?.map((prevProject) => {
+            if (prevProject.id === projectId) {
+              return { ...prevProject, name: newProjectName };
+            }
+            return prevProject;
           });
-          setUser((prev) => {
-            const newUserProjects = prev?.projects?.map((prevProject) => {
-              if (prevProject.id === projectId) {
-                return { ...prevProject, name: newProjectName };
-              }
-              return prevProject;
-            });
-            const updatedUser = { ...prev, projects: newUserProjects };
-            updateUser(updatedUser);
-            return updatedUser;
-          });
-        }
+          const updatedUser = { ...prev, projects: newUserProjects };
+          updateUser(updatedUser);
+          return updatedUser;
+        });
       }
     },
     [newProjectName],

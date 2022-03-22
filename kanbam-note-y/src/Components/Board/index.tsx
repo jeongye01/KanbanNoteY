@@ -29,22 +29,21 @@ function Board({ board, boardKey, index }: Iprops) {
   const onTaskSubmit = useCallback(
     async (event: React.FormEvent<HTMLFormElement>) => {
       event.preventDefault();
+      if (!newTask || !newTask.trim()) return;
 
-      if (newTask) {
-        setProject((prev) => {
-          const newTaskObj = { id: Date.now(), content: newTask };
-          const newTasks = [...prev.contents[`${boardKey}`].tasks, newTaskObj];
-          const newProject = {
-            ...prev,
-            contents: { ...prev.contents, [`${boardKey}`]: { name: board.name, tasks: newTasks } },
-          };
-          updateProject(project.id, newProject);
+      setProject((prev) => {
+        const newTaskObj = { id: Date.now(), content: newTask };
+        const newTasks = [...prev.contents[`${boardKey}`].tasks, newTaskObj];
+        const newProject = {
+          ...prev,
+          contents: { ...prev.contents, [`${boardKey}`]: { name: board.name, tasks: newTasks } },
+        };
+        updateProject(project.id, newProject);
 
-          return newProject;
-        });
+        return newProject;
+      });
 
-        setNewTask('');
-      }
+      setNewTask('');
     },
     [newTask],
   );
@@ -83,6 +82,7 @@ function Board({ board, boardKey, index }: Iprops) {
   const onEdit = useCallback(
     async (event: React.FormEvent<HTMLFormElement>) => {
       event.preventDefault();
+      if (!updatedBoardName || !updatedBoardName.trim()) return;
       setProject((prev) => {
         let copyBoard = { ...prev.contents[`${boardKey}`] };
         copyBoard['name'] = updatedBoardName;

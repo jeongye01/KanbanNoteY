@@ -22,22 +22,21 @@ function Task({ boardKey, task, idx }: Iprops) {
   const onTaskSubmit = useCallback(
     async (event: React.FormEvent<HTMLFormElement>) => {
       event.preventDefault();
+      if (!updatedTaskName || !updatedTaskName.trim()) return;
 
-      if (updatedTaskName) {
-        setProject((prev) => {
-          const copyBoard = { ...prev.contents[boardKey] };
-          const copyTasks = [...copyBoard.tasks];
-          const { id } = copyTasks[idx];
-          copyTasks.splice(idx, 0, { id, content: updatedTaskName });
-          copyTasks.splice(idx + 1, 1);
-          const newProject = {
-            ...prev,
-            contents: { ...prev.contents, [`${boardKey}`]: { name: copyBoard.name, tasks: copyTasks } },
-          };
-          updateProject(project.id, newProject);
-          return newProject;
-        });
-      }
+      setProject((prev) => {
+        const copyBoard = { ...prev.contents[boardKey] };
+        const copyTasks = [...copyBoard.tasks];
+        const { id } = copyTasks[idx];
+        copyTasks.splice(idx, 0, { id, content: updatedTaskName });
+        copyTasks.splice(idx + 1, 1);
+        const newProject = {
+          ...prev,
+          contents: { ...prev.contents, [`${boardKey}`]: { name: copyBoard.name, tasks: copyTasks } },
+        };
+        updateProject(project.id, newProject);
+        return newProject;
+      });
     },
     [updatedTaskName],
   );
