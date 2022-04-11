@@ -72,7 +72,7 @@ function EachProject({ project }: Props) {
         history.push(`/project/${user?.projects[deleteIndex + 1].id}`);
       } catch {
         console.log(3);
-        if (user.projects.length === 0) history.push('/');
+        if (user && user?.projects?.length === 1) history.push('/');
         else history.push(`/project/${user?.projects[deleteIndex - 1].id}`);
       }
     }

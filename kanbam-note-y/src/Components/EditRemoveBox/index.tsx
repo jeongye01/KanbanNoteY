@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import Input from '../Input';
 import { faEllipsis, faTrashCan, faPenSquare, faArrowRotateLeft } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -17,13 +17,17 @@ interface Props {
 
 function EditRemoveBox({ onEdit, onInputChange, inputValue, text, onDelete, link }: Props) {
   console.log('EditRemoveBox');
-  const [ellipsisClicked, setEllipsisClicked] = useState(false);
+  const [ellipsisClicked, setEllipsisClicked] = useState<boolean>();
   const [editMode, setEditMode] = useState(false);
   const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     await onEdit(event);
     setEllipsisClicked(false);
     setEditMode(false);
   };
+  useEffect(() => {
+    setEllipsisClicked(false);
+    return setEllipsisClicked(false);
+  }, []);
   return (
     <Container>
       {ellipsisClicked && editMode ? (
