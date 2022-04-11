@@ -5,7 +5,7 @@ import { useCallback, useEffect, useState } from 'react';
 import Board from '../../Components/Board';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../../firebase';
-import { useParams } from 'react-router-dom';
+import { useHistory, useParams } from 'react-router-dom';
 import { IboardInfo, IboardsOrder, IProject } from '../../Typings/db';
 import { Container, AddBoard, AddBoardInput, AddBoardSubmit, Bubble, DotWrapper, Dot } from './styles';
 import { userState } from '../../Atoms/user';
@@ -17,6 +17,7 @@ function Project() {
   const [loading, setLoading] = useState<boolean>(true);
   const user = useRecoilValue(userState);
   console.log('Project');
+  const history = useHistory();
 
   const onNewBoardSubmit = useCallback(
     async (event: React.FormEvent<HTMLFormElement>) => {
@@ -131,6 +132,9 @@ function Project() {
         const { projectId, order } = orderSnap.data();
         setProject({ id, name, contents });
         setBoardsOrder({ projectId, order });
+      } else {
+        //유효하지 않은 url
+        history.push('/');
       }
     },
     [projectId],
