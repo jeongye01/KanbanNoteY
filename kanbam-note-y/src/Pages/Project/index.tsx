@@ -1,18 +1,21 @@
 import { DragDropContext, Droppable, DropResult } from 'react-beautiful-dnd';
 import { boardsOrderState, projectState } from '../../Atoms/project';
-import { useRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import { useCallback, useEffect, useState } from 'react';
 import Board from '../../Components/Board';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { useParams } from 'react-router-dom';
 import { IboardInfo, IboardsOrder, IProject } from '../../Typings/db';
-import { Container, AddBoard, AddBoardInput, AddBoardSubmit } from './styles';
+import { Container, AddBoard, AddBoardInput, AddBoardSubmit, Bubble, DotWrapper, Dot } from './styles';
+import { userState } from '../../Atoms/user';
 function Project() {
   const { projectId } = useParams<{ projectId?: string }>();
   const [project, setProject] = useRecoilState(projectState);
   const [boardsOrder, setBoardsOrder] = useRecoilState(boardsOrderState);
   const [newBoardName, setNewBoardName] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(true);
+  const user = useRecoilValue(userState);
   console.log('Project');
 
   const onNewBoardSubmit = useCallback(
@@ -114,38 +117,40 @@ function Project() {
       });
     }
   };
-  const fetchProject = async (projectId: string) => {
-    const docRef = doc(db, 'projects', projectId);
-    const docSnap = await getDoc(docRef);
-    if (docSnap.exists()) {
-      const { id, name, contents } = docSnap.data();
-      setProject({ id, name, contents });
-    }
-  };
 
-  const fetchBoardsOrder = async (projectId: string) => {
-    const docRef = doc(db, 'boardsOrders', projectId);
+  const fetchProjectData = useCallback(
+    async (projectId: string) => {
+      setLoading(true);
+      const orderRef = doc(db, 'boardsOrders', projectId);
+      const boardsRef = doc(db, 'projects', projectId);
+      const orderSnap = await getDoc(orderRef);
+      const boardsSnap = await getDoc(boardsRef);
 
-    const docSnap = await getDoc(docRef);
-    if (docSnap.exists()) {
-      console.log('order', boardsOrder);
-      const { projectId, order } = docSnap.data();
+      if (orderSnap.exists() && boardsSnap.exists()) {
+        const { id, name, contents } = boardsSnap.data();
+        const { projectId, order } = orderSnap.data();
+        setProject({ id, name, contents });
+        setBoardsOrder({ projectId, order });
+      }
+    },
+    [projectId],
+  );
 
-      setBoardsOrder({ projectId, order });
-    }
-  };
   useEffect(() => {
     if (projectId) {
-      fetchBoardsOrder(projectId);
-      fetchProject(projectId);
+      fetchProjectData(projectId);
     }
-  }, [projectId]);
-
+  }, [fetchProjectData]);
+  useEffect(() => {
+    if (project.id === boardsOrder.projectId) {
+      setLoading(false);
+    }
+  }, [project, boardsOrder]);
   return (
     <>
-      {projectId ? (
+      {user?.projects?.length > 0 ? (
         <>
-          {project.id === boardsOrder.projectId ? (
+          {!loading ? (
             <Container>
               <DragDropContext onDragEnd={onDragEnd}>
                 <Droppable droppableId="all-boards" direction="horizontal" type="column">
@@ -160,7 +165,7 @@ function Project() {
                   )}
                 </Droppable>
               </DragDropContext>
-              <AddBoard onSubmit={onNewBoardSubmit}>
+              <AddBoard as="form" onSubmit={onNewBoardSubmit}>
                 <AddBoardInput
                   onChange={onNewBoardChange}
                   value={newBoardName}
@@ -172,10 +177,28 @@ function Project() {
                 <span>👻</span>
               </AddBoard>
             </Container>
-          ) : null}
+          ) : (
+            <div
+              style={{
+                padding: '1rem',
+              }}
+            >
+              <DotWrapper>
+                <Dot delay="0s" />
+                <Dot delay=".1s" />
+                <Dot delay=".2s" />
+              </DotWrapper>
+            </div>
+          )}
         </>
       ) : (
-        <span>&larr;프로젝트를 추가해 주세요!</span>
+        <span>
+          {' '}
+          <Bubble>
+            <span>&larr;프로젝트를 추가해 주세요!</span>
+            <span>👻</span>
+          </Bubble>
+        </span>
       )}
     </>
   );

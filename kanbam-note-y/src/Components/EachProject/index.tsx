@@ -53,13 +53,29 @@ function EachProject({ project }: Props) {
   const onDelete = async () => {
     await deleteDoc(doc(db, 'projects', projectId));
     await deleteDoc(doc(db, 'boardsOrders', projectId));
-    const projects = user?.projects?.filter((prevProject) => prevProject.id !== projectId);
+    let deleteIndex: number = 0;
+    const projects = user?.projects?.filter((prevProject, i) => {
+      if (prevProject.id === projectId) deleteIndex = i;
+      return prevProject.id !== projectId;
+    });
+
     setUser((prev) => {
       const updatedUser = { ...prev, projects };
       updateUser(updatedUser);
       return updatedUser;
     });
-    if (projectOnUrl === projectId) history.push('/');
+    console.log(1, projectOnUrl === projectId, projectOnUrl, projectId);
+    if (projectOnUrl === projectId) {
+      console.log(1);
+      try {
+        console.log(2);
+        history.push(`/project/${user?.projects[deleteIndex + 1].id}`);
+      } catch {
+        console.log(3);
+        if (user.projects.length === 0) history.push('/');
+        else history.push(`/project/${user?.projects[deleteIndex - 1].id}`);
+      }
+    }
   };
   const updateUser = async (userInfo: IUser) => {
     await setDoc(doc(db, 'users', user.email), {
