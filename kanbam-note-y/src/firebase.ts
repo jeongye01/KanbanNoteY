@@ -7,7 +7,7 @@ import {
   onAuthStateChanged,
 } from 'firebase/auth';
 import { doc, setDoc, getDoc, getFirestore } from 'firebase/firestore';
-
+import { defaultProjectContents, defaultBoardsOrder, IUser, IProject } from './Typings/db';
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_apiKey,
   authDomain: process.env.REACT_APP_authDomain,
@@ -74,11 +74,22 @@ export const logout = () => {
     });
 };
 
-//read
-/*
-const starCountRef = ref(db, 'posts/' + postId + '/starCount');
-onValue(starCountRef, (snapshot) => {
-  const data = snapshot.val();
-  updateStarCount(postElement, data);
-});
-*/
+export const updateUser = async (id: string, user: IUser, newProjectName: string): Promise<void> => {
+  await setDoc(doc(db, 'users', user.email), {
+    ...user,
+    projects: [...user.projects, { name: newProjectName, id }],
+  });
+};
+export const createProject = async (id: string, newProjectName: string): Promise<void> => {
+  await setDoc(doc(db, 'projects', id), {
+    id,
+    name: newProjectName,
+    contents: defaultProjectContents,
+  });
+};
+export const createBoardsOrder = async (id: string): Promise<void> => {
+  await setDoc(doc(db, 'boardsOrders', id), {
+    projectId: id,
+    order: defaultBoardsOrder,
+  });
+};

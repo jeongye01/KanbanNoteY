@@ -1,6 +1,7 @@
 import { atom } from 'recoil';
 import { IUser } from '../Typings/db';
 
+//유저 상태
 export const userState = atom<IUser>({
   key: 'user',
   default: {
@@ -11,6 +12,7 @@ export const userState = atom<IUser>({
   },
 });
 
+//유저가 로그인 되었는가
 export const isLoggedIn = atom<boolean>({
   key: 'userLoggedIn',
   default: false,

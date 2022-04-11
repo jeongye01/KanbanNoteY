@@ -25,7 +25,16 @@ function Board({ board, boardKey, index }: Iprops) {
   const [isNewTaskActive, setIsNewTaskActive] = useState<boolean>(false);
   const [project, setProject] = useRecoilState(projectState);
   const setBoardsOrder = useSetRecoilState(boardsOrderState);
-
+  const updateProject = async (id: string, newProject: IProject) => {
+    -(await setDoc(doc(db, 'projects', id), {
+      ...newProject,
+    }));
+  };
+  const updateBoardsOrder = async (id: string, newBoardsOrder: IboardsOrder) => {
+    await setDoc(doc(db, 'boardsOrders', project.id), {
+      ...newBoardsOrder,
+    });
+  };
   const onTaskSubmit = useCallback(
     async (event: React.FormEvent<HTMLFormElement>) => {
       event.preventDefault();
@@ -47,16 +56,7 @@ function Board({ board, boardKey, index }: Iprops) {
     },
     [newTask],
   );
-  const updateProject = async (id: string, newProject: IProject) => {
-    -(await setDoc(doc(db, 'projects', id), {
-      ...newProject,
-    }));
-  };
-  const updateBoardsOrder = async (id: string, newBoardsOrder: IboardsOrder) => {
-    await setDoc(doc(db, 'boardsOrders', project.id), {
-      ...newBoardsOrder,
-    });
-  };
+
   const onTaskChanged = useCallback((event: React.FormEvent<HTMLInputElement>) => {
     setNewTask(event.currentTarget.value);
   }, []);
