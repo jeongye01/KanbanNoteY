@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router';
 import { useHistory } from 'react-router-dom';
 import { db } from '../../firebase';
@@ -86,6 +86,9 @@ function EachProject({ project }: Props) {
     (event: React.FormEvent<HTMLInputElement>) => setNewProjectName(event.currentTarget.value),
     [],
   );
+  useEffect(() => {
+    if (!project) return;
+  }, [project]);
   return (
     <Container>
       <EditRemoveBox

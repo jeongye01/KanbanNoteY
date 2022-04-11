@@ -7,7 +7,7 @@ import {
   onAuthStateChanged,
 } from 'firebase/auth';
 import { doc, setDoc, getDoc, getFirestore } from 'firebase/firestore';
-import { defaultProjectContents, defaultBoardsOrder, IUser, IProject } from './Typings/db';
+import { defaultProjectContents, defaultBoardsOrder, IUser, IProject, IboardsOrder } from './Typings/db';
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_apiKey,
   authDomain: process.env.REACT_APP_authDomain,
@@ -91,5 +91,16 @@ export const createBoardsOrder = async (id: string): Promise<void> => {
   await setDoc(doc(db, 'boardsOrders', id), {
     projectId: id,
     order: defaultBoardsOrder,
+  });
+};
+
+export const updateProject = async (id: string, newProject: IProject): Promise<void> => {
+  -(await setDoc(doc(db, 'projects', id), {
+    ...newProject,
+  }));
+};
+export const updateBoardsOrder = async (id: string, newBoardsOrder: IboardsOrder, project: IProject): Promise<void> => {
+  await setDoc(doc(db, 'boardsOrders', project.id), {
+    ...newBoardsOrder,
   });
 };

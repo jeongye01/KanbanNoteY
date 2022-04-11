@@ -1,40 +1,27 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Droppable, Draggable } from 'react-beautiful-dnd';
 import { faX } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { boardsOrderState, projectState } from '../../Atoms/project';
-import { IboardInfo, IboardsOrder, IProject } from '../../Typings/db';
+import { IboardInfo } from '../../Typings/db';
 import Task from '../Task';
 import { useSetRecoilState, useRecoilState } from 'recoil';
-import { doc, setDoc } from 'firebase/firestore';
-import { db } from '../../firebase';
 import EditRemoveBox from '../EditRemoveBox';
 import Input from '../Input';
 import { Container, TaskList, Add, Header } from './styles';
-
+import { updateProject, updateBoardsOrder } from '../../firebase';
 interface Iprops {
   boardKey: string;
   board: IboardInfo;
   index: number;
 }
 function Board({ board, boardKey, index }: Iprops) {
-  console.log('Board');
-
-  const [updatedBoardName, setUpdatedBoardName] = useState<string>(board.name);
-  const [newTask, setNewTask] = useState<string>('');
-  const [isNewTaskActive, setIsNewTaskActive] = useState<boolean>(false);
   const [project, setProject] = useRecoilState(projectState);
   const setBoardsOrder = useSetRecoilState(boardsOrderState);
-  const updateProject = async (id: string, newProject: IProject) => {
-    -(await setDoc(doc(db, 'projects', id), {
-      ...newProject,
-    }));
-  };
-  const updateBoardsOrder = async (id: string, newBoardsOrder: IboardsOrder) => {
-    await setDoc(doc(db, 'boardsOrders', project.id), {
-      ...newBoardsOrder,
-    });
-  };
+  const [updatedBoardName, setUpdatedBoardName] = useState<string>(board?.name);
+  const [newTask, setNewTask] = useState<string>('');
+  const [addNewTaskMode, setAddNewTaskMode] = useState<boolean>(false);
+
   const onTaskSubmit = useCallback(
     async (event: React.FormEvent<HTMLFormElement>) => {
       event.preventDefault();
@@ -47,8 +34,10 @@ function Board({ board, boardKey, index }: Iprops) {
           ...prev,
           contents: { ...prev.contents, [`${boardKey}`]: { name: board.name, tasks: newTasks } },
         };
-        updateProject(project.id, newProject);
-
+        const fireProcess = async () => {
+          await updateProject(project.id, newProject);
+        };
+        fireProcess();
         return newProject;
       });
 
@@ -60,26 +49,33 @@ function Board({ board, boardKey, index }: Iprops) {
   const onTaskChanged = useCallback((event: React.FormEvent<HTMLInputElement>) => {
     setNewTask(event.currentTarget.value);
   }, []);
-  const onDelete = async () => {
-    setBoardsOrder((prev) => {
-      const newOrder = [...prev.order];
-      newOrder.splice(index, 1);
-      const newBoardsOrder = { ...prev, order: newOrder };
-      updateBoardsOrder(project.id, newBoardsOrder);
-      return newBoardsOrder;
-    });
+  const onBoardDelete = () => {
+    if (!project) return;
     setProject((prev) => {
       const newBoards = { ...prev.contents };
       delete newBoards[`${boardKey}`];
       const newProject = { ...prev, contents: newBoards };
-      updateProject(project.id, newProject);
+      const fireProcess = async () => {
+        await updateProject(project.id, newProject);
+      };
+      fireProcess();
       return newProject;
     });
+    setBoardsOrder((prev) => {
+      const newOrder = [...prev.order];
+      newOrder.splice(index, 1);
+      const newBoardsOrder = { ...prev, order: newOrder };
+      const fireProcess = async () => {
+        await updateBoardsOrder(project.id, newBoardsOrder, project);
+      };
+      fireProcess();
+      return newBoardsOrder;
+    });
   };
-  const onEditChange = useCallback((event: React.FormEvent<HTMLInputElement>) => {
+  const onBoardNameEditVarChange = useCallback((event: React.FormEvent<HTMLInputElement>) => {
     setUpdatedBoardName(event.currentTarget.value);
   }, []);
-  const onEdit = useCallback(
+  const onBoardNameEditVarSubmit = useCallback(
     async (event: React.FormEvent<HTMLFormElement>) => {
       event.preventDefault();
       if (!updatedBoardName || !updatedBoardName.trim()) return;
@@ -88,26 +84,34 @@ function Board({ board, boardKey, index }: Iprops) {
         copyBoard['name'] = updatedBoardName;
 
         const newProject = { ...prev, contents: { ...prev.contents, [`${boardKey}`]: copyBoard } };
-        updateProject(project.id, newProject);
+        const fireProcess = async () => {
+          await updateProject(project.id, newProject);
+        };
+        fireProcess();
         return newProject;
       });
     },
     [updatedBoardName],
   );
+
+  useEffect(() => {
+    //board clean up
+    if (!board) return;
+  }, [board]);
   return (
     <>
-      {true ? (
+      {board ? (
         <>
           <Draggable draggableId={boardKey} index={index}>
             {(provided) => (
               <Container {...provided.dragHandleProps} {...provided.draggableProps} ref={provided.innerRef}>
                 <Header>
                   <EditRemoveBox
-                    onEdit={onEdit}
-                    onInputChange={onEditChange}
+                    onEdit={onBoardNameEditVarSubmit}
+                    onInputChange={onBoardNameEditVarChange}
                     inputValue={updatedBoardName}
-                    text={board.name}
-                    onDelete={onDelete}
+                    text={board?.name}
+                    onDelete={onBoardDelete}
                   />
                 </Header>
 
@@ -125,16 +129,16 @@ function Board({ board, boardKey, index }: Iprops) {
                     </TaskList>
                   )}
                 </Droppable>
-                {isNewTaskActive ? (
+                {addNewTaskMode ? (
                   <div>
                     <Input onSubmit={onTaskSubmit} onChange={onTaskChanged} value={newTask} placeholder="할 일 추가" />
 
-                    <button onClick={() => setIsNewTaskActive(false)}>
+                    <button onClick={() => setAddNewTaskMode(false)}>
                       <FontAwesomeIcon icon={faX} size="sm" />
                     </button>
                   </div>
                 ) : (
-                  <Add onClick={() => setIsNewTaskActive(true)}>+ 새로 만들기</Add>
+                  <Add onClick={() => setAddNewTaskMode(true)}>+ 새로 만들기</Add>
                 )}
               </Container>
             )}
