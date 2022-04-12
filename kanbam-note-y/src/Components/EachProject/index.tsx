@@ -19,6 +19,7 @@ function EachProject({ project }: Props) {
   const { projectId: projectOnUrl } = useParams<{ projectId: string }>();
   const [newProjectName, setNewProjectName] = useState('');
   const [user, setUser] = useRecoilState<IUser>(userState);
+  const [display, setDisplay] = useState<boolean>(true);
   const onNewProjectNameSubmit = useCallback(
     async (event: React.FormEvent<HTMLFormElement>) => {
       event.preventDefault();
@@ -87,19 +88,23 @@ function EachProject({ project }: Props) {
     [],
   );
   useEffect(() => {
-    if (!project) return;
-  }, [project]);
+    return () => setDisplay(false);
+  }, []);
   return (
-    <Container>
-      <EditRemoveBox
-        onEdit={onNewProjectNameSubmit}
-        onInputChange={onInputChange}
-        inputValue={newProjectName}
-        text={projectName}
-        onDelete={onDelete}
-        link={`/project/${projectId}`}
-      />
-    </Container>
+    <>
+      {display && (
+        <Container>
+          <EditRemoveBox
+            onEdit={onNewProjectNameSubmit}
+            onInputChange={onInputChange}
+            inputValue={newProjectName}
+            text={projectName}
+            onDelete={onDelete}
+            link={`/project/${projectId}`}
+          />
+        </Container>
+      )}
+    </>
   );
 }
 

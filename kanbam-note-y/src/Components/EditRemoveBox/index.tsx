@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { Container } from './styles';
+import { displayPartsToString } from 'typescript';
 
 interface Props {
   onEdit: (event: React.FormEvent<HTMLFormElement>) => void;
@@ -12,11 +13,12 @@ interface Props {
   inputValue: string;
   text: string;
   onDelete: () => void;
+  display?: () => void;
   link?: string;
 }
 
-function EditRemoveBox({ onEdit, onInputChange, inputValue, text, onDelete, link }: Props) {
-  console.log('EditRemoveBox');
+function EditRemoveBox({ onEdit, onInputChange, inputValue, text, onDelete, link, display }: Props) {
+  console.log('EditRemoveBox', text);
   const [ellipsisClicked, setEllipsisClicked] = useState<boolean>(false);
   const [editMode, setEditMode] = useState(false);
   const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -24,10 +26,10 @@ function EditRemoveBox({ onEdit, onInputChange, inputValue, text, onDelete, link
     setEllipsisClicked(false);
     setEditMode(false);
   };
+
   useEffect(() => {
-    setEllipsisClicked(false);
-    return setEllipsisClicked(false);
-  }, []);
+    if (!onEdit || !onInputChange || !inputValue || !text || !onDelete) return;
+  }, [onEdit, onInputChange, inputValue, text, onDelete]);
   return (
     <Container>
       {ellipsisClicked && editMode ? (
@@ -50,8 +52,9 @@ function EditRemoveBox({ onEdit, onInputChange, inputValue, text, onDelete, link
             <FontAwesomeIcon icon={faPenSquare} />
           </li>
           <li
-            onClick={async () => {
-              await onDelete();
+            onClick={() => {
+              if (display) display();
+              onDelete();
               setEllipsisClicked(false);
             }}
           >

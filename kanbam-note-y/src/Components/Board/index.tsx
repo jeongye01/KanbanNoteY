@@ -94,57 +94,45 @@ function Board({ board, boardKey, index }: Iprops) {
     [updatedBoardName],
   );
 
-  useEffect(() => {
-    //board clean up
-    if (!board) return;
-  }, [board]);
   return (
     <>
-      {board ? (
-        <>
-          <Draggable draggableId={boardKey} index={index}>
-            {(provided) => (
-              <Container {...provided.dragHandleProps} {...provided.draggableProps} ref={provided.innerRef}>
-                <Header>
-                  <EditRemoveBox
-                    onEdit={onBoardNameEditVarSubmit}
-                    onInputChange={onBoardNameEditVarChange}
-                    inputValue={updatedBoardName}
-                    text={board?.name}
-                    onDelete={onBoardDelete}
-                  />
-                </Header>
+      <Draggable draggableId={boardKey} index={index}>
+        {(provided) => (
+          <Container {...provided.dragHandleProps} {...provided.draggableProps} ref={provided.innerRef}>
+            <Header>
+              <EditRemoveBox
+                onEdit={onBoardNameEditVarSubmit}
+                onInputChange={onBoardNameEditVarChange}
+                inputValue={updatedBoardName}
+                text={board?.name}
+                onDelete={onBoardDelete}
+              />
+            </Header>
 
-                <Droppable droppableId={boardKey}>
-                  {(provided, snapshot) => (
-                    <TaskList
-                      ref={provided.innerRef}
-                      {...provided.droppableProps}
-                      isDraggingOver={snapshot.isDraggingOver}
-                    >
-                      {board?.tasks?.map((task, idx) => (
-                        <Task boardKey={boardKey} task={task} idx={idx} key={task.id} />
-                      ))}
-                      {provided.placeholder}
-                    </TaskList>
-                  )}
-                </Droppable>
-                {addNewTaskMode ? (
-                  <div>
-                    <Input onSubmit={onTaskSubmit} onChange={onTaskChanged} value={newTask} placeholder="할 일 추가" />
+            <Droppable droppableId={boardKey}>
+              {(provided, snapshot) => (
+                <TaskList ref={provided.innerRef} {...provided.droppableProps} isDraggingOver={snapshot.isDraggingOver}>
+                  {board?.tasks?.map((task, idx) => (
+                    <Task boardKey={boardKey} task={task} idx={idx} key={task.id} />
+                  ))}
+                  {provided.placeholder}
+                </TaskList>
+              )}
+            </Droppable>
+            {addNewTaskMode ? (
+              <div>
+                <Input onSubmit={onTaskSubmit} onChange={onTaskChanged} value={newTask} placeholder="할 일 추가" />
 
-                    <button onClick={() => setAddNewTaskMode(false)}>
-                      <FontAwesomeIcon icon={faX} size="sm" />
-                    </button>
-                  </div>
-                ) : (
-                  <Add onClick={() => setAddNewTaskMode(true)}>+ 새로 만들기</Add>
-                )}
-              </Container>
+                <button onClick={() => setAddNewTaskMode(false)}>
+                  <FontAwesomeIcon icon={faX} size="sm" />
+                </button>
+              </div>
+            ) : (
+              <Add onClick={() => setAddNewTaskMode(true)}>+ 새로 만들기</Add>
             )}
-          </Draggable>
-        </>
-      ) : null}
+          </Container>
+        )}
+      </Draggable>
     </>
   );
 }
