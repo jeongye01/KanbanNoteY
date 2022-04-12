@@ -73,13 +73,20 @@ export const logout = () => {
       console.log('// An error happened.');
     });
 };
-
-export const updateUser = async (id: string, user: IUser, newProjectName: string): Promise<void> => {
+//user
+export const updateUser = async (userEmail: string, userInfo: IUser) => {
+  await setDoc(doc(db, 'users', userEmail), {
+    ...userInfo,
+  });
+};
+export const addUserProject = async (id: string, user: IUser, newProjectName: string): Promise<void> => {
   await setDoc(doc(db, 'users', user.email), {
     ...user,
     projects: [...user.projects, { name: newProjectName, id }],
   });
 };
+
+//project
 export const createProject = async (id: string, newProjectName: string): Promise<void> => {
   await setDoc(doc(db, 'projects', id), {
     id,
@@ -87,17 +94,34 @@ export const createProject = async (id: string, newProjectName: string): Promise
     contents: defaultProjectContents,
   });
 };
+export const editProjectName = async (id: string, newProjectName: string): Promise<boolean> => {
+  const docRef = doc(db, 'projects', id);
+  const docSnap = await getDoc(docRef);
+
+  if (docSnap.exists()) {
+    const data = docSnap.data();
+    const updatedProject = { ...data, name: newProjectName };
+
+    await setDoc(doc(db, 'projects', id), {
+      ...updatedProject,
+    });
+    return true;
+  } else {
+    return false;
+  }
+};
+export const updateProject = async (id: string, newProject: IProject): Promise<void> => {
+  await setDoc(doc(db, 'projects', id), {
+    ...newProject,
+  });
+};
+
+//boardOrder
 export const createBoardsOrder = async (id: string): Promise<void> => {
   await setDoc(doc(db, 'boardsOrders', id), {
     projectId: id,
     order: defaultBoardsOrder,
   });
-};
-
-export const updateProject = async (id: string, newProject: IProject): Promise<void> => {
-  -(await setDoc(doc(db, 'projects', id), {
-    ...newProject,
-  }));
 };
 export const updateBoardsOrder = async (id: string, newBoardsOrder: IboardsOrder, project: IProject): Promise<void> => {
   await setDoc(doc(db, 'boardsOrders', project.id), {

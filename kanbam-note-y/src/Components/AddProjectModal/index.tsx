@@ -5,7 +5,7 @@ import { nanoid } from 'nanoid';
 import { IUser } from '../../Typings/db';
 import Input from '../Input';
 import { Container } from './styles';
-import { updateUser, createProject, createBoardsOrder } from '../../firebase';
+import { addUserProject, createProject, createBoardsOrder } from '../../firebase';
 import { useHistory } from 'react-router-dom';
 function AddProjectModal() {
   const [newProjectName, setNewProjectName] = useState<string>('');
@@ -20,7 +20,7 @@ function AddProjectModal() {
       setUser((prev) => {
         //유저 update
         const fireProcess = async () => {
-          await updateUser(id, user, newProjectName); //firebase user db update
+          await addUserProject(id, user, newProjectName); //firebase user db update
           await createProject(id, newProjectName); //firebase create project
           await createBoardsOrder(id); //firebase create boards order
         };
@@ -28,6 +28,9 @@ function AddProjectModal() {
         return { ...prev, projects: [...prev.projects, { name: newProjectName, id }] };
       });
       setNewProjectName('');
+      /*if (user.projects.length === 0) {
+        history.push(`/project/${id}`);
+      }*/
     },
     [newProjectName],
   );
@@ -36,7 +39,9 @@ function AddProjectModal() {
   }, []);
 
   useEffect(() => {
-    return () => setNewProjectName('');
+    return () => {
+      setNewProjectName('');
+    };
   }, []);
   return (
     <>

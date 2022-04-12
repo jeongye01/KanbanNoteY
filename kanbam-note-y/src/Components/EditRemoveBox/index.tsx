@@ -21,15 +21,12 @@ function EditRemoveBox({ onEdit, onInputChange, inputValue, text, onDelete, link
   console.log('EditRemoveBox', text);
   const [ellipsisClicked, setEllipsisClicked] = useState<boolean>(false);
   const [editMode, setEditMode] = useState(false);
-  const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    await onEdit(event);
+  const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    onEdit(event);
     setEllipsisClicked(false);
     setEditMode(false);
   };
 
-  useEffect(() => {
-    if (!onEdit || !onInputChange || !inputValue || !text || !onDelete) return;
-  }, [onEdit, onInputChange, inputValue, text, onDelete]);
   return (
     <Container>
       {ellipsisClicked && editMode ? (

@@ -134,7 +134,8 @@ function Project() {
         setProject({ id, name, contents });
         setBoardsOrder({ projectId, order });
       } else {
-        //유효하지 않은 url
+        //유효하지 않은 url //url이 깜빡거린다면 firebase가 변동사항이 업데이트 되지 않아서 유효해도 유효하지 않다고 판단해서 "/"로 갔다가 다시 돌아온거임
+        //첫번째 프로젝트 생성시 url이 깜빡거릴수 있음
         history.push('/');
       }
     },
@@ -150,7 +151,7 @@ function Project() {
         resetProject();
         resetBoardsOrder();
       } else {
-        history.push(`/project/${user.projects[0].id}`);
+        history.push(`/project/${user.projects[0].id}`); //“/” 일 경우유저 프로젝트가 있으면 첫번째 프로젝트 url 로 보냄
       }
     }
   }, [fetchProjectData]);
@@ -161,14 +162,10 @@ function Project() {
       setLoading(true);
     }
   }, [project, boardsOrder]);
-  useEffect(() => {
-    if (history.location.pathname === '/' && user.projects.length > 0) {
-      history.push(`/project/${user.projects[0].id}`);
-    }
-  }, [user.projects.length]);
+
   return (
     <>
-      {user?.projects?.length > 0 ? (
+      {projectId ? (
         <>
           {!loading ? (
             <Container>
@@ -212,13 +209,13 @@ function Project() {
           )}
         </>
       ) : (
-        <span>
-          {' '}
-          <Bubble>
-            <span>&larr;프로젝트를 추가해 주세요!</span>
-            <span>👻</span>
-          </Bubble>
-        </span>
+        <Bubble>
+          {user.projects.length > 0 ? (
+            <span>&larr;일을 시작하세요!👻</span>
+          ) : (
+            <span>&larr;프로젝트를 추가해 주세요!👻</span>
+          )}
+        </Bubble>
       )}
     </>
   );
