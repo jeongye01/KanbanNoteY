@@ -47,21 +47,27 @@ export const createUser = (name: string, email: string, password: string) => {
 };
 
 export const userLogin = (email: string, password: string) => {
-  signInWithEmailAndPassword(auth, email, password)
+  const result = signInWithEmailAndPassword(auth, email, password)
     .then(
       (userCredential) => {
         // Signed in
-        const user = userCredential.user;
 
-        console.log('login sucess');
+        return '로그인 성공';
       },
       // ...
     )
     .catch((error) => {
       const errorCode = error.code;
-      const errorMessage = error.message;
-      console.log(errorMessage);
+
+      if (errorCode + '' === 'auth/user-not-found') {
+        return '존재하지 않는 이메일 입니다';
+      } else if (errorCode + '' === 'auth/wrong-password') {
+        return '비밀번호가 일치하지 않습니다';
+      } else {
+        return '알 수 없는 오류가 발생했습니다.';
+      }
     });
+  return result;
 };
 
 export const logout = () => {
@@ -123,8 +129,8 @@ export const createBoardsOrder = async (id: string): Promise<void> => {
     order: defaultBoardsOrder,
   });
 };
-export const updateBoardsOrder = async (id: string, newBoardsOrder: IboardsOrder, project: IProject): Promise<void> => {
-  await setDoc(doc(db, 'boardsOrders', project.id), {
+export const updateBoardsOrder = async (projectId: string, newBoardsOrder: IboardsOrder): Promise<void> => {
+  await setDoc(doc(db, 'boardsOrders', projectId), {
     ...newBoardsOrder,
   });
 };

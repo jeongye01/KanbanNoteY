@@ -7,11 +7,10 @@ import { userLogin } from '../../firebase';
 interface IFormInputs {
   email: string;
   password: string;
+  loginResult?: string;
 }
 
 function Login() {
-  console.log('Login');
-
   const [fail, setFail] = useState(false);
 
   const {
@@ -19,10 +18,18 @@ function Login() {
     formState: { errors },
     handleSubmit,
     clearErrors,
+    setError,
   } = useForm<IFormInputs>();
-  const onSubmit: SubmitHandler<IFormInputs> = async (data) => {
+  const onSubmit: SubmitHandler<IFormInputs> = (data) => {
     const { email, password } = data;
-    userLogin(email, password);
+    userLogin(email, password).then((result) => {
+      setError('loginResult', { message: result });
+    });
+  };
+  const guestLogin = () => {
+    if (process.env.REACT_APP_GUEST_EMAIL && process.env.REACT_APP_GUEST_PASSWORD) {
+      const result = userLogin(process.env.REACT_APP_GUEST_EMAIL, process.env.REACT_APP_GUEST_PASSWORD);
+    }
   };
   return (
     <Container>
@@ -38,6 +45,7 @@ function Login() {
             placeholder="이메일"
             onClick={() => {
               clearErrors('email');
+              clearErrors('loginResult');
             }}
           />
           <span>비밀번호</span>
@@ -48,15 +56,21 @@ function Login() {
             })}
             type="password"
             placeholder="비밀번호"
-            onClick={() => clearErrors('password')}
+            onClick={() => {
+              clearErrors('password');
+              clearErrors('loginResult');
+            }}
           />
-          {fail ? <Error>알수 없는 오류가 발생했습니다.</Error> : null}
+          {errors ? <Error>{errors.loginResult?.message}</Error> : null}
           <Submit type="submit" value="로그인" />
 
           <LinkMessage>
             계정이 아직 없으신가요? <Link to={'/signup'}>회원가입</Link>
           </LinkMessage>
         </Form>
+        <LinkMessage>
+          가입없이 <button onClick={guestLogin}>게스트 로그인 &rarr;</button>
+        </LinkMessage>
       </Wrapper>
     </Container>
   );

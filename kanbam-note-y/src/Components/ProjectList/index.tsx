@@ -3,7 +3,6 @@ import { useRecoilValue } from 'recoil';
 import { userState } from '../../Atoms/user';
 
 function ProjectList() {
-  console.log('ProjectList');
   const user = useRecoilValue(userState);
 
   return (

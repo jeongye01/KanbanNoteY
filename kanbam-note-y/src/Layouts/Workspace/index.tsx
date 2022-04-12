@@ -32,7 +32,6 @@ const Workspace = ({ children }: Props) => {
   console.log('Workspace');
   const history = useHistory();
   const user = useRecoilValue(userState);
-  const { projectId } = useParams<{ projectId?: string }>();
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showAddProjectModal, setShowAddProjectModal] = useState(false);
   const resetProject = useResetRecoilState(projectState);
@@ -44,17 +43,10 @@ const Workspace = ({ children }: Props) => {
     resetProject();
     resetBoardOrder();
     resetUser();
-    history.push('/');
     logout();
+    history.push('/');
   }, []);
-  /*useEffect(() => {
-    if (!projectId) {
-      if (!user.projects[0]) {
-        resetProject();
-        resetBoardOrder();
-      }
-    }
-  }, [projectId, user.projects]);*/
+
   return (
     <div>
       <Helmet>

@@ -66,7 +66,7 @@ function Board({ board, boardKey, index }: Iprops) {
       newOrder.splice(index, 1);
       const newBoardsOrder = { ...prev, order: newOrder };
       const fireProcess = async () => {
-        await updateBoardsOrder(project.id, newBoardsOrder, project);
+        await updateBoardsOrder(project.id, newBoardsOrder);
       };
       fireProcess();
       return newBoardsOrder;

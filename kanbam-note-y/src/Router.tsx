@@ -9,6 +9,7 @@ import { doc, getDoc } from 'firebase/firestore';
 import { useSetRecoilState } from 'recoil';
 import { userState, isLoggedIn } from './Atoms/user';
 import { useRecoilState } from 'recoil';
+
 function Router() {
   const [loggedIn, setIsLoggedIn] = useRecoilState(isLoggedIn);
   const setUser = useSetRecoilState(userState);
@@ -30,7 +31,6 @@ function Router() {
       }
     }
   });
-
   return (
     <BrowserRouter>
       <Switch>
@@ -46,3 +46,24 @@ function Router() {
 }
 
 export default Router;
+
+/*
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*/

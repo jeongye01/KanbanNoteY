@@ -1,11 +1,10 @@
-import React, { useCallback, useEffect } from 'react';
+import React from 'react';
 import Input from '../Input';
 import { faEllipsis, faTrashCan, faPenSquare, faArrowRotateLeft } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { Container } from './styles';
-import { displayPartsToString } from 'typescript';
 
 interface Props {
   onEdit: (event: React.FormEvent<HTMLFormElement>) => void;

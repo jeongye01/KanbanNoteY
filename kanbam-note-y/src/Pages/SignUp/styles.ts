@@ -76,7 +76,15 @@ export const Submit = styled.input`
 
 export const LinkMessage = styled.div`
   font-size: 12px;
+  button {
+    cursor: pointer;
+    margin-top: 5px;
+    font-size: 16px;
+    font-weight: 600;
+    color: ${(props) => props.theme.accentColor};
+  }
   a {
+    font-weight: 600;
     color: ${(props) => props.theme.accentColor};
   }
 `;

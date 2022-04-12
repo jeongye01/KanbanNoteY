@@ -2,10 +2,8 @@ import React, { useCallback, useState } from 'react';
 import { Draggable } from 'react-beautiful-dnd';
 import { projectState } from '../../Atoms/project';
 import { IProject, Itask } from '../../Typings/db';
-import { useRecoilState, useRecoilValue } from 'recoil';
-import { doc, setDoc } from 'firebase/firestore';
-import { db } from '../../firebase';
-import Input from '../Input';
+import { useRecoilState } from 'recoil';
+import { updateProject } from '../../firebase';
 import EditRemoveBox from '../EditRemoveBox';
 import { List } from './styles';
 
@@ -15,14 +13,13 @@ interface Iprops {
   idx: number;
 }
 function Task({ boardKey, task, idx }: Iprops) {
-  console.log('Task');
   const [updatedTaskName, setUpdatedTaskName] = useState<string>(task.content);
   const [project, setProject] = useRecoilState(projectState);
 
-  const onTaskSubmit = useCallback(
+  const onUpdatedTaskNameSubmit = useCallback(
     async (event: React.FormEvent<HTMLFormElement>) => {
       event.preventDefault();
-      if (!updatedTaskName || !updatedTaskName.trim()) return;
+      if (!updatedTaskName.trim()) return;
 
       setProject((prev) => {
         const copyBoard = { ...prev.contents[boardKey] };
@@ -34,19 +31,15 @@ function Task({ boardKey, task, idx }: Iprops) {
           ...prev,
           contents: { ...prev.contents, [`${boardKey}`]: { name: copyBoard.name, tasks: copyTasks } },
         };
-        updateProject(project.id, newProject);
+        const fireProcess = async () => updateProject(project.id, newProject);
+        fireProcess();
         return newProject;
       });
     },
     [updatedTaskName],
   );
-  const updateProject = useCallback(async (id: string, newProject: IProject) => {
-    await setDoc(doc(db, 'projects', id), {
-      ...newProject,
-    });
-  }, []);
 
-  const onTaskChanged = useCallback((event: React.FormEvent<HTMLInputElement>) => {
+  const onUpdatedTaskNameChanged = useCallback((event: React.FormEvent<HTMLInputElement>) => {
     setUpdatedTaskName(event.currentTarget.value);
   }, []);
 
@@ -60,7 +53,8 @@ function Task({ boardKey, task, idx }: Iprops) {
         ...prev,
         contents: { ...prev.contents, [`${boardKey}`]: { name: copyBoard.name, tasks: copyTasks } },
       };
-      updateProject(project.id, newProject);
+      const fireProcess = async () => updateProject(project.id, newProject);
+      fireProcess();
       return newProject;
     });
   }, []);
@@ -74,8 +68,8 @@ function Task({ boardKey, task, idx }: Iprops) {
           isDragging={snapshot.isDragging}
         >
           <EditRemoveBox
-            onEdit={onTaskSubmit}
-            onInputChange={onTaskChanged}
+            onEdit={onUpdatedTaskNameSubmit}
+            onInputChange={onUpdatedTaskNameChanged}
             inputValue={updatedTaskName}
             text={task.content}
             onDelete={onTaskDelete}

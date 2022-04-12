@@ -4,17 +4,17 @@ import { useRecoilState, useRecoilValue, useResetRecoilState } from 'recoil';
 import { useCallback, useEffect, useState } from 'react';
 import Board from '../../Components/Board';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { db } from '../../firebase';
+import { db, updateProject, updateBoardsOrder } from '../../firebase';
 import { useHistory, useParams } from 'react-router-dom';
-import { defaultBoardsOrder, defaultProjectContents, IboardInfo, IboardsOrder, IProject } from '../../Typings/db';
 import { Container, AddBoard, AddBoardInput, AddBoardSubmit, Bubble, DotWrapper, Dot } from './styles';
 import { userState } from '../../Atoms/user';
+import { defaultProjectContents, defaultBoardsOrder } from '../../Typings/db';
 function Project() {
   const { projectId } = useParams<{ projectId?: string }>();
   const [project, setProject] = useRecoilState(projectState);
   const [boardsOrder, setBoardsOrder] = useRecoilState(boardsOrderState);
   const [newBoardName, setNewBoardName] = useState<string>('');
-  const [loading, setLoading] = useState<boolean>();
+  const [loading, setLoading] = useState<boolean>(true);
   const resetProject = useResetRecoilState(projectState);
   const resetBoardsOrder = useResetRecoilState(boardsOrderState);
   const user = useRecoilValue(userState);
@@ -24,48 +24,35 @@ function Project() {
   const onNewBoardSubmit = useCallback(
     async (event: React.FormEvent<HTMLFormElement>) => {
       event.preventDefault();
-      if (!newBoardName || !newBoardName.trim()) return;
+      if (!projectId) return;
+      if (!newBoardName.trim()) return;
       const id = Date.now();
-
       setProject((prev) => {
         console.log(id);
         const newProject = {
           ...prev,
           contents: { ...prev.contents, [`${id}`]: { name: newBoardName, tasks: [] } },
         };
-        updateProject(newProject);
+        const fireProcess = async () => updateProject(projectId, newProject);
+        fireProcess();
         return newProject;
       });
-
       setBoardsOrder((prev) => {
         console.log(id);
         const newBoardsOrder = { ...prev, order: [...prev.order, id.toString()] };
-        updateBoardsOrder(newBoardsOrder);
+        const fireProcess = async () => updateBoardsOrder(projectId, newBoardsOrder);
+        fireProcess();
         return newBoardsOrder;
       });
       setNewBoardName('');
     },
     [newBoardName],
   );
-
-  const updateProject = async (newProject: IProject) => {
-    if (projectId) {
-      await setDoc(doc(db, 'projects', projectId), {
-        ...newProject,
-      });
-    }
-  };
-  const updateBoardsOrder = async (newBoardsOrder: IboardsOrder) => {
-    if (projectId) {
-      await setDoc(doc(db, 'boardsOrders', projectId), {
-        ...newBoardsOrder,
-      });
-    }
-  };
   const onNewBoardChange = useCallback((event: React.FormEvent<HTMLInputElement>) => {
     setNewBoardName(event.currentTarget.value);
   }, []);
   const onDragEnd = async (result: DropResult) => {
+    if (!projectId) return;
     const { destination, draggableId, source, type } = result;
     console.log(destination, source);
     if (!destination) return;
@@ -79,7 +66,8 @@ function Project() {
 
       setBoardsOrder((prev) => {
         const newBoardsOrder = { ...prev, order: newOrder };
-        updateBoardsOrder(newBoardsOrder);
+        const fireProcess = async () => updateBoardsOrder(projectId, newBoardsOrder);
+        fireProcess();
 
         return newBoardsOrder;
       });
@@ -98,7 +86,8 @@ function Project() {
           ...prev,
           contents: { ...prev.contents, [source.droppableId]: { name: sourceName, tasks: sourceTasksCopy } },
         };
-        updateProject(newProject);
+        const fireProcess = async () => updateProject(projectId, newProject);
+        fireProcess();
         return newProject;
       });
     }
@@ -115,7 +104,8 @@ function Project() {
             [destination.droppableId]: { name: destinationName, tasks: destinationTasksCopy },
           },
         };
-        updateProject(newProject);
+        const fireProcess = async () => updateProject(projectId, newProject);
+        fireProcess();
         return newProject;
       });
     }
@@ -127,12 +117,11 @@ function Project() {
       const boardsRef = doc(db, 'projects', projectId);
       const orderSnap = await getDoc(orderRef);
       const boardsSnap = await getDoc(boardsRef);
-      setLoading(true);
       if (orderSnap.exists() && boardsSnap.exists()) {
         const { id, name, contents } = boardsSnap.data();
         const { projectId, order } = orderSnap.data();
-        setProject({ id, name, contents });
         setBoardsOrder({ projectId, order });
+        setProject({ id, name, contents });
       } else {
         //유효하지 않은 url //url이 깜빡거린다면 firebase가 변동사항이 업데이트 되지 않아서 유효해도 유효하지 않다고 판단해서 "/"로 갔다가 다시 돌아온거임
         //첫번째 프로젝트 생성시 url이 깜빡거릴수 있음
@@ -144,22 +133,19 @@ function Project() {
 
   useEffect(() => {
     if (projectId) {
-      console.log(projectId);
       fetchProjectData(projectId);
     } else {
-      if (!user.projects[0]) {
+      if (user.projects.length === 0) {
         resetProject();
         resetBoardsOrder();
-      } else {
-        history.push(`/project/${user.projects[0].id}`); //“/” 일 경우유저 프로젝트가 있으면 첫번째 프로젝트 url 로 보냄
       }
     }
   }, [fetchProjectData]);
   useEffect(() => {
-    if (project.id === boardsOrder.projectId && history.location.pathname !== '/') {
+    if (!project.id.trim() || !boardsOrder?.projectId.trim()) return;
+    if (project?.id === boardsOrder?.projectId) {
+      console.log(project?.id === boardsOrder?.projectId, project?.id, boardsOrder?.projectId);
       setLoading(false);
-    } else {
-      setLoading(true);
     }
   }, [project, boardsOrder]);
 
@@ -167,7 +153,19 @@ function Project() {
     <>
       {projectId ? (
         <>
-          {!loading ? (
+          {loading ? (
+            <div
+              style={{
+                padding: '1rem',
+              }}
+            >
+              <DotWrapper>
+                <Dot delay="0s" />
+                <Dot delay=".1s" />
+                <Dot delay=".2s" />
+              </DotWrapper>
+            </div>
+          ) : (
             <Container>
               <DragDropContext onDragEnd={onDragEnd}>
                 <Droppable droppableId="all-boards" direction="horizontal" type="column">
@@ -194,18 +192,6 @@ function Project() {
                 <span>👻</span>
               </AddBoard>
             </Container>
-          ) : (
-            <div
-              style={{
-                padding: '1rem',
-              }}
-            >
-              <DotWrapper>
-                <Dot delay="0s" />
-                <Dot delay=".1s" />
-                <Dot delay=".2s" />
-              </DotWrapper>
-            </div>
           )}
         </>
       ) : (
@@ -222,7 +208,3 @@ function Project() {
 }
 
 export default Project;
-
-/*
-   <Board board={board} key={`${board.name}-${index}`} index={index} />
-*/

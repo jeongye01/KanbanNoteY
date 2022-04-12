@@ -32,9 +32,9 @@ function Signup() {
     if (docSnap.exists()) {
       setFail(true);
     } else {
+      createUser(name, email, password);
       history.push('/');
     }
-    createUser(name, email, password);
   };
   return (
     <Container>
