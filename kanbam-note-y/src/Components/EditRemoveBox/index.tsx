@@ -13,11 +13,11 @@ interface Props {
   inputValue: string;
   text: string;
   onDelete: () => void;
-  display?: () => void;
+
   link?: string;
 }
 
-function EditRemoveBox({ onEdit, onInputChange, inputValue, text, onDelete, link, display }: Props) {
+function EditRemoveBox({ onEdit, onInputChange, inputValue, text, onDelete, link }: Props) {
   console.log('EditRemoveBox', text);
   const [ellipsisClicked, setEllipsisClicked] = useState<boolean>(false);
   const [editMode, setEditMode] = useState(false);
@@ -53,7 +53,6 @@ function EditRemoveBox({ onEdit, onInputChange, inputValue, text, onDelete, link
           </li>
           <li
             onClick={() => {
-              if (display) display();
               onDelete();
               setEllipsisClicked(false);
             }}

@@ -47,12 +47,14 @@ const Workspace = ({ children }: Props) => {
     history.push('/');
     logout();
   }, []);
-  useEffect(() => {
+  /*useEffect(() => {
     if (!projectId) {
-      if (!user.projects[0]) return;
-      history.push(`/project/${user.projects[0].id}`);
+      if (!user.projects[0]) {
+        resetProject();
+        resetBoardOrder();
+      }
     }
-  }, [projectId, user.projects]);
+  }, [projectId, user.projects]);*/
   return (
     <div>
       <Helmet>

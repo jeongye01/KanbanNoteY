@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
 import { userState } from '../../Atoms/user';
 import { nanoid } from 'nanoid';
@@ -6,10 +6,11 @@ import { IUser } from '../../Typings/db';
 import Input from '../Input';
 import { Container } from './styles';
 import { updateUser, createProject, createBoardsOrder } from '../../firebase';
+import { useHistory } from 'react-router-dom';
 function AddProjectModal() {
   const [newProjectName, setNewProjectName] = useState<string>('');
   const [user, setUser] = useRecoilState<IUser>(userState);
-
+  const history = useHistory();
   const onSubmit = useCallback(
     async (event: React.SyntheticEvent) => {
       event.preventDefault();
@@ -34,11 +35,16 @@ function AddProjectModal() {
     setNewProjectName(event.currentTarget.value);
   }, []);
 
+  useEffect(() => {
+    return () => setNewProjectName('');
+  }, []);
   return (
-    <Container>
-      <h1>New Project 😀</h1>
-      <Input onChange={onChange} onSubmit={onSubmit} value={newProjectName} />
-    </Container>
+    <>
+      <Container>
+        <h1>New Project 😀</h1>
+        <Input onChange={onChange} onSubmit={onSubmit} value={newProjectName} />
+      </Container>
+    </>
   );
 }
 

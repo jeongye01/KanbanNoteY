@@ -1,12 +1,12 @@
 import { DragDropContext, Droppable, DropResult } from 'react-beautiful-dnd';
 import { boardsOrderState, projectState } from '../../Atoms/project';
-import { useRecoilState, useRecoilValue } from 'recoil';
+import { useRecoilState, useRecoilValue, useResetRecoilState } from 'recoil';
 import { useCallback, useEffect, useState } from 'react';
 import Board from '../../Components/Board';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { useHistory, useParams } from 'react-router-dom';
-import { IboardInfo, IboardsOrder, IProject } from '../../Typings/db';
+import { defaultBoardsOrder, defaultProjectContents, IboardInfo, IboardsOrder, IProject } from '../../Typings/db';
 import { Container, AddBoard, AddBoardInput, AddBoardSubmit, Bubble, DotWrapper, Dot } from './styles';
 import { userState } from '../../Atoms/user';
 function Project() {
@@ -14,7 +14,9 @@ function Project() {
   const [project, setProject] = useRecoilState(projectState);
   const [boardsOrder, setBoardsOrder] = useRecoilState(boardsOrderState);
   const [newBoardName, setNewBoardName] = useState<string>('');
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>();
+  const resetProject = useResetRecoilState(projectState);
+  const resetBoardsOrder = useResetRecoilState(boardsOrderState);
   const user = useRecoilValue(userState);
   console.log('Project');
   const history = useHistory();
@@ -121,12 +123,11 @@ function Project() {
 
   const fetchProjectData = useCallback(
     async (projectId: string) => {
-      setLoading(true);
       const orderRef = doc(db, 'boardsOrders', projectId);
       const boardsRef = doc(db, 'projects', projectId);
       const orderSnap = await getDoc(orderRef);
       const boardsSnap = await getDoc(boardsRef);
-
+      setLoading(true);
       if (orderSnap.exists() && boardsSnap.exists()) {
         const { id, name, contents } = boardsSnap.data();
         const { projectId, order } = orderSnap.data();
@@ -142,14 +143,29 @@ function Project() {
 
   useEffect(() => {
     if (projectId) {
+      console.log(projectId);
       fetchProjectData(projectId);
+    } else {
+      if (!user.projects[0]) {
+        resetProject();
+        resetBoardsOrder();
+      } else {
+        history.push(`/project/${user.projects[0].id}`);
+      }
     }
   }, [fetchProjectData]);
   useEffect(() => {
-    if (project.id === boardsOrder.projectId) {
+    if (project.id === boardsOrder.projectId && history.location.pathname !== '/') {
       setLoading(false);
+    } else {
+      setLoading(true);
     }
   }, [project, boardsOrder]);
+  useEffect(() => {
+    if (history.location.pathname === '/' && user.projects.length > 0) {
+      history.push(`/project/${user.projects[0].id}`);
+    }
+  }, [user.projects.length]);
   return (
     <>
       {user?.projects?.length > 0 ? (
