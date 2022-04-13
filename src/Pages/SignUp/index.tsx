@@ -24,15 +24,16 @@ function Signup() {
   const password = useRef({});
   password.current = watch('password', '');
   const onSubmit: SubmitHandler<IFormInputs> = async (data) => {
-    const { name, email, password, password_check } = data;
-
-    const docRef = doc(db, 'users', email);
-    const docSnap = await getDoc(docRef);
-    if (docSnap.exists()) {
-      setFail(true);
-    } else {
-      createUser(name, email, password);
-      history.push('/');
+    const { name, email, password } = data;
+    if (name.trim() && email.trim() && password.trim()) {
+      const docRef = doc(db, 'users', email);
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        setFail(true);
+      } else {
+        createUser(name, email, password);
+        history.push('/');
+      }
     }
   };
   return (
