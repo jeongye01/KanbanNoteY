@@ -39,7 +39,7 @@ function Login() {
           <h1>로그인</h1>
 
           <span>이메일</span>
-          {errors.email && <Error>{errors.email.message}</Error>}
+
           <input
             {...register('email', { required: '이메일을 입력해 주세요' })}
             type="email"
@@ -49,8 +49,9 @@ function Login() {
               clearErrors('loginResult');
             }}
           />
+          {errors.email && <Error>{errors.email.message}</Error>}
           <span>비밀번호</span>
-          {errors.password && <Error>{errors.password.message}</Error>}
+
           <input
             {...register('password', {
               required: '비밀번호를 입력해 주세요.',
@@ -62,6 +63,7 @@ function Login() {
               clearErrors('loginResult');
             }}
           />
+          {errors.password && <Error>{errors.password.message}</Error>}
           {errors ? <Error>{errors.loginResult?.message}</Error> : null}
           <Submit type="submit" value="로그인" />
 
