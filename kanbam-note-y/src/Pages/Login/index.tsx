@@ -49,7 +49,7 @@ function Login() {
               clearErrors('loginResult');
             }}
           />
-          {errors.email && <Error>{errors.email.message}</Error>}
+
           <span>비밀번호</span>
 
           <input
@@ -63,8 +63,9 @@ function Login() {
               clearErrors('loginResult');
             }}
           />
+          {errors.email && <Error>{errors.email.message}</Error>}
           {errors.password && <Error>{errors.password.message}</Error>}
-          {errors ? <Error>{errors.loginResult?.message}</Error> : null}
+          {errors.loginResult && <Error>{errors.loginResult?.message}</Error>}
           <Submit type="submit" value="로그인" />
 
           <LinkMessage>
