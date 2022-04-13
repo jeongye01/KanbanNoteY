@@ -37,8 +37,9 @@ function Login() {
         <Logo to={'#'}>yanban✅</Logo>
         <Form onSubmit={handleSubmit(onSubmit)}>
           <h1>로그인</h1>
-          {errors.email && <Error>{errors.email.message}</Error>}
+
           <span>이메일</span>
+          {errors.email && <Error>{errors.email.message}</Error>}
           <input
             {...register('email', { required: '이메일을 입력해 주세요' })}
             type="email"
