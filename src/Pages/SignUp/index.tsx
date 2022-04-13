@@ -64,10 +64,6 @@ function Signup() {
           <input
             {...register('password', {
               required: '비밀번호를 입력해 주세요.',
-              pattern: {
-                value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$@$!%*?&])[A-Za-z\d$@$!%*?&]{8,16}/i,
-                message: '최소 8 자 및 최대 16 자, 영문자 및 숫자 하나 이상',
-              },
             })}
             type="password"
             placeholder="비밀번호"
