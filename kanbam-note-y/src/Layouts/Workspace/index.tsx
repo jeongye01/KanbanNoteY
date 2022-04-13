@@ -29,7 +29,6 @@ interface Props {
   children: React.ReactNode;
 }
 const Workspace = ({ children }: Props) => {
-  console.log('Workspace');
   const history = useHistory();
   const user = useRecoilValue(userState);
   const [showUserMenu, setShowUserMenu] = useState(false);

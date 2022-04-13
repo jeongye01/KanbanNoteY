@@ -31,7 +31,7 @@ export const createUser = (name: string, email: string, password: string) => {
     .then(async (userCredential) => {
       // Signed in
       const user = userCredential.user;
-      console.log(user.uid);
+
       await setDoc(doc(db, 'users', email), {
         uid: user.uid,
         name,
@@ -75,9 +75,7 @@ export const logout = () => {
     .then(() => {
       console.log('Sign-out successful.');
     })
-    .catch((error) => {
-      console.log('// An error happened.');
-    });
+    .catch((error) => {});
 };
 //user
 export const updateUser = async (userEmail: string, userInfo: IUser) => {

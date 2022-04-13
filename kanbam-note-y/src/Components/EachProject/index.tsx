@@ -14,7 +14,6 @@ interface Props {
 }
 
 function EachProject({ project }: Props) {
-  console.log('EachProject');
   const { id: projectId, name: projectName } = project;
   const history = useHistory();
   const { projectId: projectOnUrl } = useParams<{ projectId: string }>();

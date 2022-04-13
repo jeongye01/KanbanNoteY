@@ -18,7 +18,7 @@ function Project() {
   const resetProject = useResetRecoilState(projectState);
   const resetBoardsOrder = useResetRecoilState(boardsOrderState);
   const user = useRecoilValue(userState);
-  console.log('Project');
+
   const history = useHistory();
 
   const onNewBoardSubmit = useCallback(
@@ -28,7 +28,6 @@ function Project() {
       if (!newBoardName.trim()) return;
       const id = Date.now();
       setProject((prev) => {
-        console.log(id);
         const newProject = {
           ...prev,
           contents: { ...prev.contents, [`${id}`]: { name: newBoardName, tasks: [] } },
@@ -38,7 +37,6 @@ function Project() {
         return newProject;
       });
       setBoardsOrder((prev) => {
-        console.log(id);
         const newBoardsOrder = { ...prev, order: [...prev.order, id.toString()] };
         const fireProcess = async () => updateBoardsOrder(projectId, newBoardsOrder);
         fireProcess();
@@ -54,7 +52,7 @@ function Project() {
   const onDragEnd = async (result: DropResult) => {
     if (!projectId) return;
     const { destination, draggableId, source, type } = result;
-    console.log(destination, source);
+
     if (!destination) return;
     if (destination.droppableId === source.droppableId && destination.index === source.index) {
       return;
@@ -144,7 +142,6 @@ function Project() {
   useEffect(() => {
     if (!project.id.trim() || !boardsOrder?.projectId.trim()) return;
     if (project?.id === boardsOrder?.projectId) {
-      console.log(project?.id === boardsOrder?.projectId, project?.id, boardsOrder?.projectId);
       setLoading(false);
     }
   }, [project, boardsOrder]);

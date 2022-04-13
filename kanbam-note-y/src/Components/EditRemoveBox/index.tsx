@@ -17,7 +17,6 @@ interface Props {
 }
 
 function EditRemoveBox({ onEdit, onInputChange, inputValue, text, onDelete, link }: Props) {
-  console.log('EditRemoveBox', text);
   const [ellipsisClicked, setEllipsisClicked] = useState<boolean>(false);
   const [editMode, setEditMode] = useState(false);
   const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {

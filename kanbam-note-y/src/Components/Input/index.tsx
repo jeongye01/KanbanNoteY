@@ -7,7 +7,6 @@ interface Props {
   placeholder?: string;
 }
 function Input({ onSubmit, onChange, value, placeholder }: Props) {
-  console.log('Input');
   return (
     <Form onSubmit={onSubmit}>
       <input type="text" value={value} onChange={onChange} placeholder={placeholder} />

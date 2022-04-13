@@ -6,7 +6,6 @@ interface Props {
   children: React.ReactNode;
 }
 const Modal = ({ children }: Props) => {
-  console.log('Modal');
   return (
     <CreateModal>
       <div>
