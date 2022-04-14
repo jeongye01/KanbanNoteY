@@ -80,12 +80,13 @@ notion이나 trello서비스에서 볼 수 있는 칸반노트를 구현해 보�
 
 ### 👨‍💻 프로젝트 Issues
 
-- useEffect나 useState 내부(+recoil set 함수)에서 async await(비동기 처리)
+> useEffect나 useState 내부(+recoil set 함수)에서 async await(비동기 처리)
+
   <details>
   <summary>토글 접기/펼치기</summary>
   <div markdown="1">
-     async await 함수는 Promise 객체를 return 한다. 
-     useEffect의 경우 아무것도 return하지 않거나 clean up 함수를 return하고, 상태를 set 하는 함수들은 상태를 반환해야 하기 때문에 async await 함수가 될 수 없다. 따라서 훅 안이나 밖에 해당 기능을 정의하여 만들어두고 hook안에서 호출하도록 했다. 아래 코드의 경우 firebase.ts 파일 함수들을 정의해 둠 fireProcess가 하는 기능을 setUser이 직접적으로 async await 함수가 되어서 firebase api를 사용하려고 하려고 하면 에러가 남. 코드도 지저분해짐.
+     async await 함수는 Promise 객체를 return 합니다. 
+     useEffect의 경우 아무것도 return하지 않거나 clean up 함수를 return하고, 상태를 set 하는 함수들은 상태를 반환해야 하기 때문에 async await 함수가 될 수 없습니다. 따라서 훅 안이나 밖에 해당 기능을 정의하여 만들어두고 hook안에서 호출하도록 했습니다. 아래 코드의 경우 firebase.ts 파일 함수들을 정의해 두었습니다. fireProcess가 하는 기능을, setUser이 직접적으로 async await 함수가 되어 firebase api를 사용하려고 하려고 하면 에러가 나며 코드도 지저분해집니다.
   </div>
   </details>
 
@@ -98,7 +99,7 @@ setUser(async (prev) => {
 });
 ```
 
-set 함수 안에 firebase처리를 넣어서 처리한 이유는 아래 코드에서 볼 수 있듯이 element의 업데이트된 상태를 공유 할 수 있고, 프로젝트를 업데이트하는 과정을 파악하기 쉽기 때문이다.(가독성이 좋음)
+set 함수 안에 firebase처리를 넣어서 처리한 이유는 아래 코드에서 볼 수 있듯이 element의 업데이트된 상태를 공유 할 수 있고, 프로젝트를 업데이트하는 과정을 파악하기 쉽기 때문입니다.(가독성이 좋음)
 
 ```ts
 setProject((prev) => {
@@ -113,18 +114,31 @@ setProject((prev) => {
 });
 ```
 
-| header | description |
-| -----: | ----------: |
-|  cell1 |       cell2 |
+> router 이동시 메모리 leak 에러
 
-| header | description |
-| :----- | :---------: |
-| cell1  |    cell2    |
+```
+Warning: Can't perform a React state update on an unmounted component.
+This is a no-op, but it indicates a memory leak in your application.
+To fix, cancel all subscriptions and asynchronous tasks in a useEffect cleanup
+```
 
-`console.log('your message')`
+router 이동 후, 이동 전 컴포넌트에 state를 바꾸려는 시도를 했기 때문에 발생한 에러.
 
-github flavored markdown=>다양한 문법들 있음
+```ts
+if (projectOnUrl === projectId) {
+  //현재 보고 있는 프로젝트를 삭제 할 경우 다른 프로젝트(아래에 있는 프로젝트)로 이동하도록 url을 바꿔주는 과정에서 EditRemoveBox 컴포넌트의 상태를 바꾸려는 시도가 일어나 발생한 에러입니다.
+  try {
+    history.push(`/project/${user?.projects[deleteIndex + 1].id}`);
+  } catch {
+    if (user && user?.projects?.length === 1) history.push('/');
+    else history.push(`/project/${user?.projects[deleteIndex - 1].id}`);
+  }
+}
+```
 
-todo
--[]adf
--[]asdf
+```ts
+useEffect(() => {
+  // clean up!
+  if (projectId !== projectOnUrl) return () => setDisplay(false);
+}, []);
+```
