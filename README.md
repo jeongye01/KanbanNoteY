@@ -80,7 +80,7 @@ notion이나 trello서비스에서 볼 수 있는 칸반노트를 구현해 보�
 
 ### 👨‍💻 프로젝트 Issues
 
-> useEffect나 useState 내부(+recoil set 함수)에서 async await(비동기 처리)
+> 📜useEffect나 useState 내부(+recoil set 함수)에서 async await(비동기 처리)
 
   <details>
   <summary>토글 접기/펼치기</summary>
@@ -115,8 +115,9 @@ setProject((prev) => {
 ```
 
 <br/>
+<br/>
 
-> router 이동시 메모리 leak 에러
+> 📜router 이동시 메모리 leak 에러
 
 ```
 Warning: Can't perform a React state update on an unmounted component.
