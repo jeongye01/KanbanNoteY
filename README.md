@@ -80,7 +80,7 @@ notion이나 trello서비스에서 볼 수 있는 칸반노트를 구현해 보�
 
 ### 👨‍💻 프로젝트 Issues
 
-> 📜useEffect나 useState 내부(+recoil set 함수)에서 async await(비동기 처리)
+> #### 📜useEffect나 useState 내부(+recoil set 함수)에서 async await(비동기 처리)
 
   <details>
   <summary>토글 접기/펼치기</summary>
@@ -117,7 +117,7 @@ setProject((prev) => {
 <br/>
 <br/>
 
-> 📜router 이동시 메모리 leak 에러
+> #### 📜router 이동시 메모리 leak 에러
 
 ```
 Warning: Can't perform a React state update on an unmounted component.
@@ -139,9 +139,27 @@ if (projectOnUrl === projectId) {
 }
 ```
 
+해결 코드
+
 ```ts
 useEffect(() => {
   // clean up!
   if (projectId !== projectOnUrl) return () => setDisplay(false);
 }, []);
+```
+
+<br/>
+<br/>
+
+---
+
+> #### 📜event.stopPropagation()
+
+모달 외부 클릭 시 모달이 닫히게 하는 방법을 고민하다가 부모의 영역을 화면 전체로 하고 자식 영역에서 발생하는 이벤트 버블링을 방지하도록 했습니다.
+
+```ts
+    ...
+      <div onClick={stopPropagation} style={style}>
+        ....
+    ...
 ```
