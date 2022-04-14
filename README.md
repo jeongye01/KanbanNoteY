@@ -172,3 +172,13 @@ useEffect(() => {
 
 - min-width 속성
   왼쪽 사이드바가 프로젝트 내부 보드가 늘어나거나 브라우저를 좁히는 것과 상관없이 너비가 유지 되도록 하기 위해 사용
+
+---
+
+### Getting Started
+
+```
+$ git clone https://github.com/jeongye01/KanbanNoteY.git
+$ npm install
+$ npm start
+```
