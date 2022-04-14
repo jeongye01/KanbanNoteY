@@ -76,10 +76,41 @@ notion이나 trello서비스에서 볼 수 있는 칸반노트를 구현해 보�
  ┗ 📜Styles.ts
 ```
 
+---
+
+### 👨‍💻 프로젝트 Issues
+
+- useEffect나 useState 내부(+recoil set 함수)에서 async await(비동기 처리)
+  <details>
+  <summary>토글 접기/펼치기</summary>
+  <div markdown="1">
+     async await 함수는 Promise 객체를 return 한다. 
+     useEffect의 경우 아무것도 return하지 않거나 clean up 함수를 return하고, 상태를 set 하는 함수들은 상태를 반환해야 하기 때문에 async await 함수가 될 수 없다. 따라서 훅 안이나 밖에 해당 기능을 정의하여 만들어두고 hook안에서 호출하도록 했다. 아래 코드의 경우 firebase.ts 파일 함수들을 정의해 둠 fireProcess가 하는 기능을 setUser이 직접적으로 async await 함수가 되어서 firebase api를 사용하려고 하려고 하면 에러가 남. 코드도 지저분해짐.
+  </div>
+  </details>
+
+```ts
+//bad!!!!!!!!!!!!!!
+setUser(async (prev) => {
+  await setDoc(doc(db, 'projects', id), {
+    ...newProject,
+  });
+});
 ```
-.
-+ --  REadm
-console.log(dafe;)
+
+set 함수 안에 firebase처리를 넣어서 처리한 이유는 아래 코드에서 볼 수 있듯이 element의 업데이트된 상태를 공유 할 수 있고, 프로젝트를 업데이트하는 과정을 파악하기 쉽기 때문이다.(가독성이 좋음)
+
+```ts
+setProject((prev) => {
+  const newBoards = { ...prev.contents };
+  delete newBoards[`${boardKey}`];
+  const newProject = { ...prev, contents: newBoards };
+  const fireProcess = async () => {
+    await updateProject(project.id, newProject);
+  };
+  fireProcess();
+  return newProject;
+});
 ```
 
 | header | description |
