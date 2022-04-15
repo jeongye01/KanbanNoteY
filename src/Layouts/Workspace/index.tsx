@@ -25,12 +25,13 @@ import {
 import { faCirclePlus, faCircleXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Helmet } from 'react-helmet';
+import useUser from '../../utils/useUser';
 interface Props {
   children: React.ReactNode;
 }
 const Workspace = ({ children }: Props) => {
   const history = useHistory();
-  const user = useRecoilValue(userState);
+  const { user } = useUser();
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showAddProjectModal, setShowAddProjectModal] = useState(false);
   const resetProject = useResetRecoilState(projectState);
@@ -54,17 +55,20 @@ const Workspace = ({ children }: Props) => {
         <meta name="description" content="kanban note" />
       </Helmet>
       <Header>
-        {true && (
+        {user && (
           <RightMenu>
             <span onClick={onClickUserMenu}>
-              <ProfileImg src={gravatar.url(user.email, { s: '28px', d: 'retro' })} alt={user.name} />
+              <ProfileImg
+                src={gravatar.url(user?.email || '', { s: '28px', d: 'retro' })}
+                alt={user?.displayName || ''}
+              />
             </span>
             {showUserMenu && (
               <Menu style={{ right: 0, top: 38 }} show={showUserMenu} onCloseModal={onClickUserMenu}>
                 <ProfileModal>
-                  <img src={gravatar.url(user.email, { s: '36px', d: 'retro' })} alt={user.name} />
+                  <img src={gravatar.url(user?.email || '', { s: '36px', d: 'retro' })} alt={user.displayName || ''} />
                   <div>
-                    <span id="profile-name">{user.name}</span>
+                    <span id="profile-name">{user?.displayName || ''}</span>
                     <span id="profile-active">Active</span>
                   </div>
                 </ProfileModal>

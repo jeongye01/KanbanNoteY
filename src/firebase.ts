@@ -1,13 +1,14 @@
 import { initializeApp } from 'firebase/app';
+import { getFirestore, collection, getDocs, setDoc, DocumentData, doc, getDoc } from 'firebase/firestore/lite';
 import {
   getAuth,
   signOut,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
-  onAuthStateChanged,
+  updateProfile,
 } from 'firebase/auth';
-import { doc, setDoc, getDoc, getFirestore } from 'firebase/firestore';
 import { defaultProjectContents, defaultBoardsOrder, IUser, IProject, IboardsOrder } from './Typings/db';
+
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_apiKey,
   authDomain: process.env.REACT_APP_authDomain,
@@ -17,57 +18,29 @@ const firebaseConfig = {
   appId: process.env.REACT_APP_appId,
   measurementId: process.env.REACT_APP_measurementId,
 };
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
-//database
 
-export const db = getFirestore();
+export const db = getFirestore(app);
+
+//project
+export const getProjects = async (): Promise<DocumentData[]> => {
+  const projectsCol = collection(db, 'projects');
+  const projectSnapshot = await getDocs(projectsCol);
+  const projectList = projectSnapshot.docs.map((doc) => doc.data());
+  return projectList;
+};
+
+//database
 
 //Auth
 export const auth = getAuth();
 export const user = auth.currentUser;
 export const createUser = (name: string, email: string, password: string) => {
-  createUserWithEmailAndPassword(auth, email, password)
-    .then(async (userCredential) => {
-      // Signed in
-      const user = userCredential.user;
-
-      await setDoc(doc(db, 'users', email), {
-        uid: user.uid,
-        name,
-        email,
-        password,
-        projects: [],
-      });
-    })
-    .catch((error) => {
-      const errorCode = error.code;
-      const errorMessage = error.message;
-    });
+  return createUserWithEmailAndPassword(auth, email, password);
 };
 
-export const userLogin = (email: string, password: string) => {
-  const result = signInWithEmailAndPassword(auth, email, password)
-    .then(
-      (userCredential) => {
-        // Signed in
-
-        return '로그인 성공';
-      },
-      // ...
-    )
-    .catch((error) => {
-      const errorCode = error.code;
-
-      if (errorCode + '' === 'auth/user-not-found') {
-        return '존재하지 않는 이메일 입니다';
-      } else if (errorCode + '' === 'auth/wrong-password') {
-        return '비밀번호가 일치하지 않습니다';
-      } else {
-        return '알 수 없는 오류가 발생했습니다.';
-      }
-    });
-  return result;
+export const login = (email: string, password: string) => {
+  return signInWithEmailAndPassword(auth, email, password);
 };
 
 export const logout = () => {
@@ -77,6 +50,7 @@ export const logout = () => {
     })
     .catch((error) => {});
 };
+
 //user
 export const updateUser = async (userEmail: string, userInfo: IUser) => {
   await setDoc(doc(db, 'users', userEmail), {

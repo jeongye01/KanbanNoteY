@@ -2,14 +2,15 @@ import { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Container, Wrapper, Logo, Form, Submit, Error, LinkMessage, Body } from './styles';
 import { useForm, SubmitHandler } from 'react-hook-form';
-import { db, createUser } from '../../firebase';
+import { createUser } from '../../firebase';
 import { useHistory } from 'react-router-dom';
-import { doc, getDoc } from 'firebase/firestore';
+import { updateProfile } from 'firebase/auth';
 interface IFormInputs {
   name: string;
   email: string;
   password: string;
   password_check: string;
+  signUpError?: string;
 }
 function Signup() {
   const history = useHistory();
@@ -20,20 +21,23 @@ function Signup() {
     handleSubmit,
     clearErrors,
     watch,
+    setError,
   } = useForm<IFormInputs>();
   const password = useRef({});
   password.current = watch('password', '');
   const onSubmit: SubmitHandler<IFormInputs> = async (data) => {
     const { name, email, password } = data;
     if (name.trim() && email.trim() && password.trim()) {
-      const docRef = doc(db, 'users', email);
-      const docSnap = await getDoc(docRef);
-      if (docSnap.exists()) {
-        setFail(true);
-      } else {
-        createUser(name, email, password);
-        history.push('/');
-      }
+      createUser(name, email, password)
+        .then(async (userCredential) => {
+          // Signed in
+          const user = userCredential.user;
+          updateProfile(user, { displayName: name });
+          history.push('/login');
+        })
+        .catch((error) => {
+          setError('signUpError', { message: error });
+        });
     }
   };
   return (
@@ -61,10 +65,11 @@ function Signup() {
             }}
           />
 
-          {errors.password && <Error>{errors.password.message}</Error>}
+          {errors?.password && <Error>{errors?.password?.message}</Error>}
           <input
             {...register('password', {
               required: '비밀번호를 입력해 주세요.',
+              minLength: { value: 6, message: '비밀번호는 최소 6자 이상입니다' },
             })}
             type="password"
             placeholder="비밀번호"
@@ -75,13 +80,14 @@ function Signup() {
           <input
             {...register('password_check', {
               required: '비밀번호를 입력해 주세요.',
+              minLength: 6,
               validate: (value) => value === password.current || '비밀번호가 일치 하지 않습니다.',
             })}
             type="password"
             placeholder="비밀번호 확인"
             onClick={() => clearErrors('password_check')}
           />
-          {fail ? <Error>이미 존재하는 이메일 입니다.</Error> : null}
+          {errors?.signUpError ? <Error>{errors?.signUpError?.message}</Error> : null}
           <Submit type="submit" value="가입 하기" />
           <LinkMessage>
             계정이 있으신가요? <Link to={'/login'}>로그인</Link>

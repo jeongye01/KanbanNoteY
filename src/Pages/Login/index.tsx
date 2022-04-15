@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import { Container, Wrapper, Logo, Form, Error, Submit, LinkMessage } from '../SignUp/styles';
 import { useForm, SubmitHandler } from 'react-hook-form';
-import { userLogin } from '../../firebase';
+import { login } from '../../firebase';
 
 interface IFormInputs {
   email: string;
@@ -12,7 +12,7 @@ interface IFormInputs {
 
 function Login() {
   const [fail, setFail] = useState(false);
-
+  const history = useHistory();
   const {
     register,
     formState: { errors },
@@ -22,13 +22,17 @@ function Login() {
   } = useForm<IFormInputs>();
   const onSubmit: SubmitHandler<IFormInputs> = (data) => {
     const { email, password } = data;
-    userLogin(email, password).then((result) => {
-      setError('loginResult', { message: result });
-    });
+    login(email, password)
+      .then((user) => {
+        history.push('/');
+      })
+      .catch((error) => {
+        setError('loginResult', { message: error.code });
+      });
   };
   const guestLogin = () => {
     if (process.env.REACT_APP_GUEST_EMAIL && process.env.REACT_APP_GUEST_PASSWORD) {
-      const result = userLogin(process.env.REACT_APP_GUEST_EMAIL, process.env.REACT_APP_GUEST_PASSWORD);
+      const result = login(process.env.REACT_APP_GUEST_EMAIL, process.env.REACT_APP_GUEST_PASSWORD);
     }
   };
   return (
