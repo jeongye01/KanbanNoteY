@@ -104,7 +104,7 @@ function Project() {
 
   useEffect(() => {
     if (!projectId) return;
-    setLoading(true);
+
     const unsub = onSnapshot(doc(db, 'projects', projectId), (doc) => {
       const result = doc.data() as IProject;
       if (result) {

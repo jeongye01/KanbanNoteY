@@ -1,5 +1,5 @@
 import React from 'react';
-import Input from '../Input';
+import Form from '../Form';
 import { faEllipsis, faTrashCan, faPenSquare, faArrowRotateLeft } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useState } from 'react';
@@ -28,7 +28,7 @@ function EditRemoveBox({ onEdit, onInputChange, inputValue, text, onDelete, link
   return (
     <Container>
       {ellipsisClicked && editMode ? (
-        <Input onChange={onInputChange} onSubmit={onSubmit} value={inputValue} placeholder={text} />
+        <Form onChange={onInputChange} onSubmit={onSubmit} value={inputValue} placeholder={text} />
       ) : (
         <>
           {link ? (

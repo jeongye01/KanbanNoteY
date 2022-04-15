@@ -1,14 +1,14 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useHistory } from 'react-router-dom';
 import gravatar from 'gravatar';
-import { useRecoilValue, useResetRecoilState } from 'recoil';
-import { userState } from '../../Atoms/user';
+import { useResetRecoilState } from 'recoil';
+
 import Menu from '../../Components/Menu';
 import ProjectList from '../../Components/ProjectList';
 import AddProjectModal from '../../Components/AddProjectModal';
 import { logout } from '../../firebase';
-import { useParams } from 'react-router-dom';
-import { projectState } from '../../Atoms/project';
+
+import { projectState, projectsState } from '../../Atoms/project';
 import {
   Channels,
   MainView,
@@ -19,7 +19,7 @@ import {
   ProfileImg,
   ProfileModal,
   RightMenu,
-  WorkspaceName,
+  ServiceName,
   WorkspaceWrapper,
 } from './styles';
 import { faCirclePlus, faCircleXmark } from '@fortawesome/free-solid-svg-icons';
@@ -35,16 +35,14 @@ const Workspace = ({ children }: Props) => {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showAddProjectModal, setShowAddProjectModal] = useState(false);
   const resetProject = useResetRecoilState(projectState);
-  // const resetBoardOrder = useResetRecoilState(boardsOrderState);
-  const resetUser = useResetRecoilState(userState);
+  const resetProjects = useResetRecoilState(projectsState);
 
   const onClickUserMenu = useCallback(() => setShowUserMenu((prev) => !prev), []);
   const onClickLogout = useCallback(() => {
-    /*resetProject();
-    resetBoardOrder();
-    resetUser();
     logout();
-    history.push('/');*/
+    resetProject();
+    resetProjects();
+    history.push('/login');
   }, []);
 
   return (
@@ -54,6 +52,7 @@ const Workspace = ({ children }: Props) => {
         <link rel="icon" type="image/png" href="favicon.ico" sizes="16x16" />
         <meta name="description" content="kanban note" />
       </Helmet>
+
       <Header>
         {user && (
           <RightMenu>
@@ -80,7 +79,7 @@ const Workspace = ({ children }: Props) => {
       </Header>
       <WorkspaceWrapper>
         <Channels>
-          <WorkspaceName>Yanban ✅</WorkspaceName>
+          <ServiceName>Yanban ✅</ServiceName>
           <MenuScroll>
             <AddProject>
               <span>Your Projects</span>
@@ -95,7 +94,7 @@ const Workspace = ({ children }: Props) => {
             <ProjectList />
             {showAddProjectModal && (
               <Menu
-                style={{ left: 260, top: 105 }}
+                style={{ left: 210, top: 155 }}
                 show={showAddProjectModal}
                 onCloseModal={() => {
                   setShowAddProjectModal((prev) => !prev);

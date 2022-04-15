@@ -7,7 +7,7 @@ import { IboardInfo, IProject } from '../../Typings/db';
 import Task from '../Task';
 import { useSetRecoilState, useRecoilState, useRecoilValue } from 'recoil';
 import EditRemoveBox from '../EditRemoveBox';
-import Input from '../Input';
+import Form from '../Form';
 import { Container, TaskList, Add, Header } from './styles';
 import { updateProject, updateBoardsOrder } from '../../firebase';
 interface Iprops {
@@ -105,7 +105,7 @@ function Board({ board, boardId, index }: Iprops) {
             </Droppable>
             {addNewTaskMode ? (
               <div>
-                <Input onSubmit={onTaskSubmit} onChange={onTaskChanged} value={newTask} placeholder="할 일 추가" />
+                <Form onSubmit={onTaskSubmit} onChange={onTaskChanged} value={newTask} placeholder="할 일 추가" />
 
                 <button onClick={() => setAddNewTaskMode(false)}>
                   <FontAwesomeIcon icon={faX} size="sm" />

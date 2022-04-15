@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import useUser from '../../utils/useUser';
-import Input from '../Input';
+import Form from '../Form';
 import { Container } from './styles';
 import { createProject } from '../../firebase';
 
@@ -29,7 +29,7 @@ function AddProjectModal() {
     <>
       <Container>
         <h1>New Project 😀</h1>
-        <Input onChange={onChange} onSubmit={onSubmit} value={newProjectName} />
+        <Form onChange={onChange} onSubmit={onSubmit} value={newProjectName} />
       </Container>
     </>
   );

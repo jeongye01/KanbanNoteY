@@ -25,8 +25,9 @@ const GlobalStyle = createGlobalStyle`
 `;
 
 export const theme: DefaultTheme = {
-  outerbgColor: '#A3CB38',
-  innerbgColor: '#fafafa',
+  darkBlue: '#032D7C',
+  lightBlue: '#3E5DD1',
+  innerbgColor: '#F5F8FE',
   textColor: 'black',
   accentColor: '#93D42E',
   buttonColor: '#ffc312',

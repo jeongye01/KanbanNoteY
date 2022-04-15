@@ -1,17 +1,17 @@
 import React from 'react';
-import { Form } from './styles';
+import { SForm } from './styles';
 interface Props {
   onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
   onChange: (event: React.FormEvent<HTMLInputElement>) => void;
   value: string;
   placeholder?: string;
 }
-function Input({ onSubmit, onChange, value, placeholder }: Props) {
+function Form({ onSubmit, onChange, value, placeholder }: Props) {
   return (
-    <Form onSubmit={onSubmit}>
+    <SForm onSubmit={onSubmit}>
       <input type="text" value={value} onChange={onChange} placeholder={placeholder} />
-    </Form>
+    </SForm>
   );
 }
 
-export default React.memo(Input);
+export default React.memo(Form);

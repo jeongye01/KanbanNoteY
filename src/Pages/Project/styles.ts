@@ -32,7 +32,7 @@ export const Bubble = styled.div`
   min-width: 270px;
   height: 62px;
   border: 0;
-  background-color: ${(props) => props.theme.outerbgColor};
+  background-color: ${(props) => props.theme.darkBlue};
   border-bottom-left-radius: 41px;
   border-bottom-right-radius: 41px;
   border-top-left-radius: 41px;

@@ -7,7 +7,7 @@ export const RightMenu = styled.div`
 
 export const Header = styled.header`
   height: 38px;
-  background: ${(props) => props.theme.outerbgColor};
+  background: ${(props) => props.theme.darkBlue};
   color: #ffffff;
   box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.1);
 
@@ -51,7 +51,7 @@ export const ProfileModal = styled.div`
 export const LogOutButton = styled.button`
   border: none;
   width: 100%;
-  border-top: 1px solid ${(props) => props.theme.outerbgColor};
+  border-top: 1px solid ${(props) => props.theme.darkBlue};
   background: transparent;
   display: block;
   height: 33px;
@@ -81,13 +81,14 @@ export const Workspaces = styled.div`
 export const Channels = styled.nav`
   width: 260px;
   min-width: 260px;
+
   //display: inline-flex;
   display: flex;
   flex-direction: column;
-  background: ${(props) => props.theme.outerbgColor};
+
+  background: ${(props) => props.theme.darkBlue};
   color: white;
   vertical-align: top;
-
   a {
     padding-left: 36px;
     color: inherit;
@@ -118,24 +119,24 @@ export const Channels = styled.nav`
   }
 `;
 
-export const WorkspaceName = styled.button`
+export const ServiceName = styled.button`
   height: 64px;
   line-height: 64px;
   border: none;
-  width: 100%;
-  text-align: left;
+  width: 260px;
+  min-width: 260px;
+  text-align: center;
   border-top: 1px solid white;
   border-bottom: 1px solid white;
   font-weight: 900;
   font-size: 24px;
-  background: transparent;
+  background: white;
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
-  padding: 0;
-  padding-left: 16px;
-  margin: 0;
-  color: white;
+  box-sizing: border-box;
+
+  color: ${(props) => props.theme.darkBlue};
   cursor: pointer;
 `;
 
@@ -144,11 +145,18 @@ export const MenuScroll = styled.div`
   overflow-y: auto;
 `;
 export const AddProject = styled.div`
-  padding: 5px;
+  padding: 16px;
+  margin-top: 20px;
+  width: 90%;
+  margin-left: 13px;
+  border-radius: 50px;
+  background-color: #3e5dd1;
   display: flex;
   justify-content: space-between;
   align-items: center;
   font-weight: 600;
+  box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px,
+    rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
   button {
     all: unset;
     font-size: 18px;

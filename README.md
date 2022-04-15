@@ -80,6 +80,8 @@ notion이나 trello서비스에서 볼 수 있는 칸반노트를 구현해 보�
 
 ### 👨‍💻 프로젝트 Issues
 
+> #### optimistic ui 추가하기
+
 > #### 📜useEffect나 useState 내부(+recoil set 함수)에서 async await(비동기 처리)
 
   <details>
