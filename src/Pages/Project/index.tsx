@@ -1,47 +1,35 @@
 import { DragDropContext, Droppable, DropResult } from 'react-beautiful-dnd';
-import { boardsOrderState, projectState } from '../../Atoms/project';
-import { useRecoilState, useRecoilValue, useResetRecoilState } from 'recoil';
+import { projectState } from '../../Atoms/project';
+import { useRecoilState } from 'recoil';
 import { useCallback, useEffect, useState } from 'react';
 import Board from '../../Components/Board';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { db, updateProject, updateBoardsOrder } from '../../firebase';
-import { useHistory, useParams } from 'react-router-dom';
+import { doc } from 'firebase/firestore';
+import { db, updateProject } from '../../firebase';
+import { useParams } from 'react-router-dom';
 import { Container, AddBoard, AddBoardInput, AddBoardSubmit, Bubble, DotWrapper, Dot } from './styles';
-import { userState } from '../../Atoms/user';
-import { defaultProjectContents, defaultBoardsOrder } from '../../Typings/db';
+import { IProject, Itask } from '../../Typings/db';
+import { onSnapshot } from 'firebase/firestore';
+import useUser from '../../utils/useUser';
 function Project() {
   const { projectId } = useParams<{ projectId?: string }>();
   const [project, setProject] = useRecoilState(projectState);
-  const [boardsOrder, setBoardsOrder] = useRecoilState(boardsOrderState);
   const [newBoardName, setNewBoardName] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(true);
-  const resetProject = useResetRecoilState(projectState);
-  const resetBoardsOrder = useResetRecoilState(boardsOrderState);
-  const user = useRecoilValue(userState);
-
-  const history = useHistory();
-
   const onNewBoardSubmit = useCallback(
     async (event: React.FormEvent<HTMLFormElement>) => {
       event.preventDefault();
       if (!projectId) return;
       if (!newBoardName.trim()) return;
-      const id = Date.now();
-      setProject((prev) => {
-        const newProject = {
-          ...prev,
-          contents: { ...prev.contents, [`${id}`]: { name: newBoardName, tasks: [] } },
-        };
-        const fireProcess = async () => updateProject(projectId, newProject);
-        fireProcess();
-        return newProject;
-      });
-      setBoardsOrder((prev) => {
-        const newBoardsOrder = { ...prev, order: [...prev.order, id.toString()] };
-        const fireProcess = async () => updateBoardsOrder(projectId, newBoardsOrder);
-        fireProcess();
-        return newBoardsOrder;
-      });
+      const id = Date.now() + '';
+
+      const newProject: IProject = {
+        ...project,
+        boards: { ...project.boards, [id]: { name: newBoardName, tasks: [] } },
+        boardsOrder: [...project.boardsOrder, id],
+      };
+      const createBoard = async () => updateProject(projectId, newProject);
+      createBoard();
+
       setNewBoardName('');
     },
     [newBoardName],
@@ -54,97 +42,80 @@ function Project() {
     const { destination, draggableId, source, type } = result;
 
     if (!destination) return;
+    //들었다가 다시 제자리에 두는 경우
     if (destination.droppableId === source.droppableId && destination.index === source.index) {
       return;
     }
+    //board 위치 바꾸기
     if (type === 'column') {
-      const newOrder = Array.from(boardsOrder.order);
+      const newOrder = Array.from(project.boardsOrder);
       newOrder.splice(source.index, 1);
       newOrder.splice(destination.index, 0, draggableId);
 
-      setBoardsOrder((prev) => {
-        const newBoardsOrder = { ...prev, order: newOrder };
-        const fireProcess = async () => updateBoardsOrder(projectId, newBoardsOrder);
-        fireProcess();
-
-        return newBoardsOrder;
-      });
-
-      return;
+      const newProject: IProject = { ...project, boardsOrder: newOrder };
+      //optimistic ui
+      setProject(newProject);
+      const updateBoardsOrder = async () => updateProject(projectId, newProject);
+      updateBoardsOrder();
     }
 
-    const sourceTasksCopy = [...project.contents[source.droppableId].tasks];
-    const taskObj = sourceTasksCopy[source.index];
-    const sourceName = project.contents[source.droppableId].name;
+    //task 위치 바꾸기
+
+    //source board 처리
+    const sourceTasksCopy: Itask[] = [...project.boards[source.droppableId].tasks];
+    const taskObj: Itask = sourceTasksCopy[source.index];
+    const sourceName = project.boards[source.droppableId].name;
     sourceTasksCopy.splice(source.index, 1);
+
+    //같은 보드에서 이동
     if (destination.droppableId === source.droppableId) {
       sourceTasksCopy.splice(destination.index, 0, taskObj);
-      setProject((prev) => {
-        const newProject = {
-          ...prev,
-          contents: { ...prev.contents, [source.droppableId]: { name: sourceName, tasks: sourceTasksCopy } },
-        };
-        const fireProcess = async () => updateProject(projectId, newProject);
-        fireProcess();
-        return newProject;
-      });
+
+      const newProject: IProject = {
+        ...project,
+        boards: { ...project.boards, [source.droppableId]: { name: sourceName, tasks: sourceTasksCopy } },
+      };
+      //optimistic ui
+      setProject(newProject);
+      const updateTaskOrder = async () => updateProject(projectId, newProject);
+      updateTaskOrder();
     }
+
+    //다른 보드로 이동
     if (destination.droppableId !== source.droppableId) {
-      const destinationTasksCopy = [...project.contents[destination.droppableId].tasks];
-      const destinationName = project.contents[destination.droppableId].name;
+      const destinationTasksCopy: Itask[] = [...project.boards[destination.droppableId].tasks];
+      const destinationName: string = project.boards[destination.droppableId].name;
       destinationTasksCopy.splice(destination.index, 0, taskObj);
-      setProject((prev) => {
-        const newProject = {
-          ...prev,
-          contents: {
-            ...prev.contents,
-            [source.droppableId]: { name: sourceName, tasks: sourceTasksCopy },
-            [destination.droppableId]: { name: destinationName, tasks: destinationTasksCopy },
-          },
-        };
-        const fireProcess = async () => updateProject(projectId, newProject);
-        fireProcess();
-        return newProject;
-      });
+
+      const newProject: IProject = {
+        ...project,
+        boards: {
+          ...project.boards,
+          [source.droppableId]: { name: sourceName, tasks: sourceTasksCopy },
+          [destination.droppableId]: { name: destinationName, tasks: destinationTasksCopy },
+        },
+      };
+      //optimistic ui
+      setProject(newProject);
+      const updateTaskOrder = async () => updateProject(projectId, newProject);
+      updateTaskOrder();
     }
   };
 
-  const fetchProjectData = useCallback(
-    async (projectId: string) => {
-      const orderRef = doc(db, 'boardsOrders', projectId);
-      const boardsRef = doc(db, 'projects', projectId);
-      const orderSnap = await getDoc(orderRef);
-      const boardsSnap = await getDoc(boardsRef);
-      if (orderSnap.exists() && boardsSnap.exists()) {
-        const { id, name, contents } = boardsSnap.data();
-        const { projectId, order } = orderSnap.data();
-        setBoardsOrder({ projectId, order });
-        setProject({ id, name, contents });
-      } else {
-        //유효하지 않은 url //url이 깜빡거린다면 firebase가 변동사항이 업데이트 되지 않아서 유효해도 유효하지 않다고 판단해서 "/"로 갔다가 다시 돌아온거임
-        //첫번째 프로젝트 생성시 url이 깜빡거릴수 있음
-        history.push('/');
+  useEffect(() => {
+    if (!projectId) return;
+    setLoading(true);
+    const unsub = onSnapshot(doc(db, 'projects', projectId), (doc) => {
+      const result = doc.data() as IProject;
+      if (result) {
+        console.log(result);
+        setProject(result);
+        setLoading(false);
       }
-    },
-    [projectId],
-  );
+    });
 
-  useEffect(() => {
-    if (projectId) {
-      fetchProjectData(projectId);
-    } else {
-      if (user.projects.length === 0) {
-        resetProject();
-        resetBoardsOrder();
-      }
-    }
-  }, [fetchProjectData]);
-  useEffect(() => {
-    if (!project.id.trim() || !boardsOrder?.projectId.trim()) return;
-    if (project?.id === boardsOrder?.projectId) {
-      setLoading(false);
-    }
-  }, [project, boardsOrder]);
+    return () => unsub();
+  }, [projectId]);
 
   return (
     <>
@@ -168,9 +139,9 @@ function Project() {
                 <Droppable droppableId="all-boards" direction="horizontal" type="column">
                   {(provided) => (
                     <Container {...provided.droppableProps} ref={provided.innerRef}>
-                      {boardsOrder?.order?.map((boardId, index) => {
-                        const board = project.contents[boardId];
-                        return <Board board={board} key={boardId} boardKey={boardId} index={index} />;
+                      {project?.boardsOrder?.map((boardId, index) => {
+                        const board = project.boards[boardId];
+                        return <Board board={board} boardId={boardId} key={boardId} index={index} />;
                       })}
                       {provided.placeholder}
                     </Container>
@@ -193,11 +164,7 @@ function Project() {
         </>
       ) : (
         <Bubble>
-          {user.projects.length > 0 ? (
-            <span>&larr;일을 시작하세요!👻</span>
-          ) : (
-            <span>&larr;프로젝트를 추가해 주세요!👻</span>
-          )}
+          {-1 > 0 ? <span>&larr;일을 시작하세요!👻</span> : <span>&larr;프로젝트를 추가해 주세요!👻</span>}
         </Bubble>
       )}
     </>

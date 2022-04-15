@@ -1,36 +1,18 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { useRecoilState } from 'recoil';
-import { userState } from '../../Atoms/user';
-import { nanoid } from 'nanoid';
-import { IUser } from '../../Typings/db';
+import useUser from '../../utils/useUser';
 import Input from '../Input';
 import { Container } from './styles';
-import { addUserProject, createProject, createBoardsOrder } from '../../firebase';
-import { useHistory } from 'react-router-dom';
+import { createProject } from '../../firebase';
+
 function AddProjectModal() {
   const [newProjectName, setNewProjectName] = useState<string>('');
-  const [user, setUser] = useRecoilState<IUser>(userState);
-  const history = useHistory();
+  const { user } = useUser();
   const onSubmit = useCallback(
     async (event: React.SyntheticEvent) => {
       event.preventDefault();
-      if (!newProjectName.trim()) return;
-      const id = nanoid(); //프로젝트 아이디 생성
-
-      setUser((prev) => {
-        //유저 update
-        const fireProcess = async () => {
-          await addUserProject(id, user, newProjectName); //firebase user db update
-          await createProject(id, newProjectName); //firebase create project
-          await createBoardsOrder(id); //firebase create boards order
-        };
-        fireProcess();
-        return { ...prev, projects: [...prev.projects, { name: newProjectName, id }] };
-      });
+      if (!newProjectName.trim() || !user) return;
       setNewProjectName('');
-      /*if (user.projects.length === 0) {
-        history.push(`/project/${id}`);
-      }*/
+      await createProject(newProjectName, user?.uid + '');
     },
     [newProjectName],
   );

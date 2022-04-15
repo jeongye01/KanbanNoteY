@@ -2,22 +2,22 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { Droppable, Draggable } from 'react-beautiful-dnd';
 import { faX } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { boardsOrderState, projectState } from '../../Atoms/project';
-import { IboardInfo } from '../../Typings/db';
+import { projectState } from '../../Atoms/project';
+import { IboardInfo, IProject } from '../../Typings/db';
 import Task from '../Task';
-import { useSetRecoilState, useRecoilState } from 'recoil';
+import { useSetRecoilState, useRecoilState, useRecoilValue } from 'recoil';
 import EditRemoveBox from '../EditRemoveBox';
 import Input from '../Input';
 import { Container, TaskList, Add, Header } from './styles';
 import { updateProject, updateBoardsOrder } from '../../firebase';
 interface Iprops {
-  boardKey: string;
   board: IboardInfo;
   index: number;
+  boardId: string;
 }
-function Board({ board, boardKey, index }: Iprops) {
-  const [project, setProject] = useRecoilState(projectState);
-  const setBoardsOrder = useSetRecoilState(boardsOrderState);
+function Board({ board, boardId, index }: Iprops) {
+  const project = useRecoilValue(projectState);
+  //const setBoardsOrder = useSetRecoilState(boardsOrderState);
   const [updatedBoardName, setUpdatedBoardName] = useState<string>(board?.name);
   const [newTask, setNewTask] = useState<string>('');
   const [addNewTaskMode, setAddNewTaskMode] = useState<boolean>(false);
@@ -26,20 +26,16 @@ function Board({ board, boardKey, index }: Iprops) {
     async (event: React.FormEvent<HTMLFormElement>) => {
       event.preventDefault();
       if (!newTask || !newTask.trim()) return;
-
-      setProject((prev) => {
-        const newTaskObj = { id: Date.now(), content: newTask };
-        const newTasks = [...prev.contents[`${boardKey}`].tasks, newTaskObj];
-        const newProject = {
-          ...prev,
-          contents: { ...prev.contents, [`${boardKey}`]: { name: board.name, tasks: newTasks } },
-        };
-        const fireProcess = async () => {
-          await updateProject(project.id, newProject);
-        };
-        fireProcess();
-        return newProject;
-      });
+      const newTaskObj = { id: Date.now(), content: newTask };
+      const newTasks = [...project.boards[boardId].tasks, newTaskObj];
+      const newProject = {
+        ...project,
+        boards: { ...project.boards, [boardId]: { name: board.name, tasks: newTasks } },
+      };
+      const addNewTask = async () => {
+        await updateProject(project.id, newProject);
+      };
+      addNewTask();
 
       setNewTask('');
     },
@@ -51,52 +47,40 @@ function Board({ board, boardKey, index }: Iprops) {
   }, []);
   const onBoardDelete = () => {
     if (!project) return;
-    setProject((prev) => {
-      const newBoards = { ...prev.contents };
-      delete newBoards[`${boardKey}`];
-      const newProject = { ...prev, contents: newBoards };
-      const fireProcess = async () => {
-        await updateProject(project.id, newProject);
-      };
-      fireProcess();
-      return newProject;
-    });
-    setBoardsOrder((prev) => {
-      const newOrder = [...prev.order];
-      newOrder.splice(index, 1);
-      const newBoardsOrder = { ...prev, order: newOrder };
-      const fireProcess = async () => {
-        await updateBoardsOrder(project.id, newBoardsOrder);
-      };
-      fireProcess();
-      return newBoardsOrder;
-    });
+    const newBoards = { ...project.boards };
+    const newBoardsOrder = [...project.boardsOrder];
+    delete newBoards[boardId];
+    newBoardsOrder.splice(index, 1);
+    const newProject: IProject = { ...project, boards: newBoards, boardsOrder: newBoardsOrder };
+    const deleteBoard = async () => {
+      await updateProject(project.id, newProject);
+    };
+    deleteBoard();
   };
   const onBoardNameEditVarChange = useCallback((event: React.FormEvent<HTMLInputElement>) => {
     setUpdatedBoardName(event.currentTarget.value);
   }, []);
+
   const onBoardNameEditVarSubmit = useCallback(
     async (event: React.FormEvent<HTMLFormElement>) => {
       event.preventDefault();
       if (!updatedBoardName || !updatedBoardName.trim()) return;
-      setProject((prev) => {
-        let copyBoard = { ...prev.contents[`${boardKey}`] };
-        copyBoard['name'] = updatedBoardName;
 
-        const newProject = { ...prev, contents: { ...prev.contents, [`${boardKey}`]: copyBoard } };
-        const fireProcess = async () => {
-          await updateProject(project.id, newProject);
-        };
-        fireProcess();
-        return newProject;
-      });
+      let copyBoard: IboardInfo = { ...project.boards[boardId] };
+      copyBoard['name'] = updatedBoardName;
+
+      const newProject: IProject = { ...project, boards: { ...project.boards, [boardId]: copyBoard } };
+      const editBoardName = async () => {
+        await updateProject(project.id, newProject);
+      };
+      editBoardName();
     },
     [updatedBoardName],
   );
 
   return (
     <>
-      <Draggable draggableId={boardKey} index={index}>
+      <Draggable draggableId={boardId} index={index}>
         {(provided) => (
           <Container {...provided.dragHandleProps} {...provided.draggableProps} ref={provided.innerRef}>
             <Header>
@@ -109,11 +93,11 @@ function Board({ board, boardKey, index }: Iprops) {
               />
             </Header>
 
-            <Droppable droppableId={boardKey}>
+            <Droppable droppableId={boardId}>
               {(provided, snapshot) => (
                 <TaskList ref={provided.innerRef} {...provided.droppableProps} isDraggingOver={snapshot.isDraggingOver}>
                   {board?.tasks?.map((task, idx) => (
-                    <Task boardKey={boardKey} task={task} idx={idx} key={task.id} />
+                    <Task boardId={boardId} task={task} idx={idx} key={task.id} />
                   ))}
                   {provided.placeholder}
                 </TaskList>

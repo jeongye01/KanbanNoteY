@@ -11,7 +11,6 @@ interface IFormInputs {
 }
 
 function Login() {
-  const [fail, setFail] = useState(false);
   const history = useHistory();
   const {
     register,
@@ -32,7 +31,13 @@ function Login() {
   };
   const guestLogin = () => {
     if (process.env.REACT_APP_GUEST_EMAIL && process.env.REACT_APP_GUEST_PASSWORD) {
-      const result = login(process.env.REACT_APP_GUEST_EMAIL, process.env.REACT_APP_GUEST_PASSWORD);
+      login(process.env.REACT_APP_GUEST_EMAIL, process.env.REACT_APP_GUEST_PASSWORD)
+        .then((user) => {
+          history.push('/');
+        })
+        .catch((error) => {
+          setError('loginResult', { message: error.code });
+        });
     }
   };
   return (

@@ -182,3 +182,20 @@ $ git clone https://github.com/jeongye01/KanbanNoteY.git
 $ npm install
 $ npm start
 ```
+
+---
+
+Todo
+
+- [X]login
+- [X]signup
+- [X]project list read
+- [X]project create
+- [X]project rename
+- [X]project delete
+
+- []board list read
+- []board create
+- []board rename
+- []board delete
+- []board 위치 바꾸기

@@ -8,7 +8,7 @@ import ProjectList from '../../Components/ProjectList';
 import AddProjectModal from '../../Components/AddProjectModal';
 import { logout } from '../../firebase';
 import { useParams } from 'react-router-dom';
-import { projectState, boardsOrderState } from '../../Atoms/project';
+import { projectState } from '../../Atoms/project';
 import {
   Channels,
   MainView,
@@ -35,16 +35,16 @@ const Workspace = ({ children }: Props) => {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showAddProjectModal, setShowAddProjectModal] = useState(false);
   const resetProject = useResetRecoilState(projectState);
-  const resetBoardOrder = useResetRecoilState(boardsOrderState);
+  // const resetBoardOrder = useResetRecoilState(boardsOrderState);
   const resetUser = useResetRecoilState(userState);
 
   const onClickUserMenu = useCallback(() => setShowUserMenu((prev) => !prev), []);
   const onClickLogout = useCallback(() => {
-    resetProject();
+    /*resetProject();
     resetBoardOrder();
     resetUser();
     logout();
-    history.push('/');
+    history.push('/');*/
   }, []);
 
   return (

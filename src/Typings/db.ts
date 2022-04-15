@@ -19,12 +19,26 @@ export interface IboardInfo {
 }
 export interface IProject {
   id: string;
+  userId: string;
+  name: string;
+  createdAt: number;
+  boards: {
+    //key는 board id
+    [key: string]: IboardInfo;
+  };
+  //board id array
+  boardsOrder: string[];
+}
+
+/*
+export interface IProject {
+  id: string;
   name: string;
   contents: {
     [key: string]: IboardInfo;
   };
 }
-
+*/
 export interface IboardsOrder {
   projectId: string;
   order: string[];
