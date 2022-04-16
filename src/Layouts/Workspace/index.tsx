@@ -2,12 +2,12 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { useHistory } from 'react-router-dom';
 import gravatar from 'gravatar';
 import { useResetRecoilState } from 'recoil';
-
 import Menu from '../../Components/Menu';
 import ProjectList from '../../Components/ProjectList';
 import AddProjectModal from '../../Components/AddProjectModal';
 import { logout } from '../../firebase';
-
+import { faCircleUser } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { projectState, projectsState } from '../../Atoms/project';
 import {
   Channels,
@@ -23,7 +23,6 @@ import {
   WorkspaceWrapper,
 } from './styles';
 import { faCirclePlus, faCircleXmark } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Helmet } from 'react-helmet';
 import useUser from '../../utils/useUser';
 interface Props {
@@ -57,15 +56,12 @@ const Workspace = ({ children }: Props) => {
         {user && (
           <RightMenu>
             <span onClick={onClickUserMenu}>
-              <ProfileImg
-                src={gravatar.url(user?.email || '', { s: '28px', d: 'retro' })}
-                alt={user?.displayName || ''}
-              />
+              <ProfileImg src={gravatar.url(user?.email || '', { s: '28px', d: 'mp' })} alt={user?.displayName || ''} />
             </span>
             {showUserMenu && (
               <Menu style={{ right: 0, top: 38 }} show={showUserMenu} onCloseModal={onClickUserMenu}>
                 <ProfileModal>
-                  <img src={gravatar.url(user?.email || '', { s: '36px', d: 'retro' })} alt={user.displayName || ''} />
+                  <img src={gravatar.url(user?.email || '', { s: '36px', d: 'mp' })} alt={user.displayName || ''} />
                   <div>
                     <span id="profile-name">{user?.displayName || ''}</span>
                     <span id="profile-active">Active</span>

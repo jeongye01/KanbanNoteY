@@ -119,54 +119,48 @@ function Project() {
 
   return (
     <>
-      {projectId ? (
-        <>
-          {loading ? (
-            <div
-              style={{
-                padding: '1rem',
-              }}
-            >
-              <DotWrapper>
-                <Dot delay="0s" />
-                <Dot delay=".1s" />
-                <Dot delay=".2s" />
-              </DotWrapper>
-            </div>
-          ) : (
-            <Container>
-              <DragDropContext onDragEnd={onDragEnd}>
-                <Droppable droppableId="all-boards" direction="horizontal" type="column">
-                  {(provided) => (
-                    <Container {...provided.droppableProps} ref={provided.innerRef}>
-                      {project?.boardsOrder?.map((boardId, index) => {
-                        const board = project.boards[boardId];
-                        return <Board board={board} boardId={boardId} key={boardId} index={index} />;
-                      })}
-                      {provided.placeholder}
-                    </Container>
-                  )}
-                </Droppable>
-              </DragDropContext>
-              <AddBoard as="form" onSubmit={onNewBoardSubmit}>
-                <AddBoardInput
-                  onChange={onNewBoardChange}
-                  value={newBoardName}
-                  name="newBoard"
-                  type="text"
-                  placeholder="보드 추가"
-                />
-                <AddBoardSubmit type="submit" value="+" />
-                <span>👻</span>
-              </AddBoard>
-            </Container>
-          )}
-        </>
-      ) : (
-        <Bubble>
-          {-1 > 0 ? <span>&larr;일을 시작하세요!👻</span> : <span>&larr;프로젝트를 추가해 주세요!👻</span>}
-        </Bubble>
-      )}
+      <>
+        {loading ? (
+          <div
+            style={{
+              padding: '1rem',
+            }}
+          >
+            <DotWrapper>
+              <Dot delay="0s" />
+              <Dot delay=".1s" />
+              <Dot delay=".2s" />
+            </DotWrapper>
+          </div>
+        ) : (
+          <Container>
+            <DragDropContext onDragEnd={onDragEnd}>
+              <Droppable droppableId="all-boards" direction="horizontal" type="column">
+                {(provided) => (
+                  <Container {...provided.droppableProps} ref={provided.innerRef}>
+                    {project?.boardsOrder?.map((boardId, index) => {
+                      const board = project.boards[boardId];
+                      return <Board board={board} boardId={boardId} key={boardId} index={index} />;
+                    })}
+                    {provided.placeholder}
+                  </Container>
+                )}
+              </Droppable>
+            </DragDropContext>
+            <AddBoard as="form" onSubmit={onNewBoardSubmit}>
+              <AddBoardInput
+                onChange={onNewBoardChange}
+                value={newBoardName}
+                name="newBoard"
+                type="text"
+                placeholder="보드 추가"
+              />
+              <AddBoardSubmit type="submit" value="+" />
+              <span>👻</span>
+            </AddBoard>
+          </Container>
+        )}
+      </>
     </>
   );
 }

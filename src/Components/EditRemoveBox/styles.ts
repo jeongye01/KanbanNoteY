@@ -5,6 +5,10 @@ export const Container = styled.div`
   justify-content: space-between;
   align-items: center;
   button {
+    cursor: pointer;
+    &:hover {
+      font-size: 30px;
+    }
   }
   ul {
     display: flex;

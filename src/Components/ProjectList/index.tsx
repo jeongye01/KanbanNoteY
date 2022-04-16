@@ -1,26 +1,11 @@
 import ProjectItem from '../ProjectItem';
-import { useRecoilState, useRecoilValue } from 'recoil';
-import { userState } from '../../Atoms/user';
-import { getProjects } from '../../firebase';
+import { useRecoilState } from 'recoil';
+import styled from 'styled-components';
 import useUser from '../../utils/useUser';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { db } from '../../firebase';
 import { projectsState } from '../../Atoms/project';
-import {
-  getFirestore,
-  collection,
-  getDocs,
-  setDoc,
-  DocumentData,
-  doc,
-  getDoc,
-  query,
-  where,
-  addDoc,
-  onSnapshot,
-  orderBy,
-  limit,
-} from 'firebase/firestore';
+import { collection, where, onSnapshot, orderBy, query } from 'firebase/firestore';
 import { IProject } from '../../Typings/db';
 
 function ProjectList() {

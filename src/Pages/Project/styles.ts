@@ -48,8 +48,8 @@ export const Bubble = styled.div`
   padding: 5px;
   font-weight: 600;
   color: white;
+  box-shadow: rgba(50, 50, 93, 0.25) 0px 13px 27px -5px, rgba(0, 0, 0, 0.3) 0px 8px 16px -8px;
 `;
-
 export const AddBoard = styled(Bubble)`
   color: #a7b4c1;
   input {

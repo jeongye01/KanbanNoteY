@@ -3,7 +3,7 @@ import Form from '../Form';
 import { faEllipsis, faTrashCan, faPenSquare, faArrowRotateLeft } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useState } from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useParams } from 'react-router-dom';
 import { Container } from './styles';
 
 interface Props {
@@ -19,6 +19,7 @@ interface Props {
 function EditRemoveBox({ onEdit, onInputChange, inputValue, text, onDelete, link }: Props) {
   const [ellipsisClicked, setEllipsisClicked] = useState<boolean>(false);
   const [editMode, setEditMode] = useState(false);
+
   const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     onEdit(event);
     setEllipsisClicked(false);

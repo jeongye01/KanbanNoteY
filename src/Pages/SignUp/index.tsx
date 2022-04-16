@@ -5,6 +5,7 @@ import { useForm, SubmitHandler } from 'react-hook-form';
 import { createUser } from '../../firebase';
 import { useHistory } from 'react-router-dom';
 import { updateProfile } from 'firebase/auth';
+
 interface IFormInputs {
   name: string;
   email: string;

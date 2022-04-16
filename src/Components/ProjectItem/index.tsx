@@ -61,7 +61,7 @@ function ProjectItem({ project }: Props) {
   return (
     <>
       {display && (
-        <Container>
+        <Container selected={projectId === projectOnUrl}>
           <EditRemoveBox
             onEdit={onNewProjectNameSubmit}
             onInputChange={onInputChange}

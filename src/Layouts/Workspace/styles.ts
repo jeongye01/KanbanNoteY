@@ -21,6 +21,7 @@ export const ProfileImg = styled.img`
   position: absolute;
   top: 5px;
   right: 16px;
+  border-radius: 50%;
 `;
 
 export const ProfileModal = styled.div`
@@ -29,6 +30,7 @@ export const ProfileModal = styled.div`
   min-width: 360px;
   & img {
     display: flex;
+    border-radius: 50%;
   }
 
   & > div {
@@ -97,10 +99,7 @@ export const Channels = styled.nav`
     line-height: 28px;
     display: flex;
     align-items: center;
-
-    &.selected {
-      color: green;
-    }
+    width: 100%;
   }
 
   & .bold {
@@ -147,10 +146,11 @@ export const MenuScroll = styled.div`
 export const AddProject = styled.div`
   padding: 16px;
   margin-top: 20px;
+  margin-bottom: 20px;
   width: 90%;
   margin-left: 13px;
   border-radius: 50px;
-  background-color: #3e5dd1;
+  background-color: ${(props) => props.theme.lightBlue};
   display: flex;
   justify-content: space-between;
   align-items: center;
