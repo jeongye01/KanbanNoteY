@@ -80,40 +80,24 @@ notion이나 trello서비스에서 볼 수 있는 칸반노트를 구현해 보�
 
 ### 👨‍💻 프로젝트 Issues
 
-> #### optimistic ui 추가하기
+> #### optimistic ui
 
-> #### 📜useEffect나 useState 내부(+recoil set 함수)에서 async await(비동기 처리)
-
-  <details>
-  <summary>토글 접기/펼치기</summary>
-  <div markdown="1">
-     async await 함수는 Promise 객체를 return 합니다. 
-     useEffect의 경우 아무것도 return하지 않거나 clean up 함수를 return하고, 상태를 set 하는 함수들은 상태를 반환해야 하기 때문에 async await 함수가 될 수 없습니다. 따라서 훅 안이나 밖에 해당 기능을 정의하여 만들어두고 hook안에서 호출하도록 했습니다. 아래 코드의 경우 firebase.ts 파일 함수들을 정의해 두었습니다. fireProcess가 하는 기능을, setUser이 직접적으로 async await 함수가 되어 firebase api를 사용하려고 하려고 하면 에러가 나며 코드도 지저분해집니다.
-  </div>
-  </details>
+board나 task를 옮기는 과정에서 clode firebase가 업데이트 되는 것을 기다리면 옮긴 것이 바로 적용되지 않음
+따라서, db 업데이트 전에 state를 set해둠.
 
 ```ts
-//bad!!!!!!!!!!!!!!
-setUser(async (prev) => {
-  await setDoc(doc(db, 'projects', id), {
-    ...newProject,
-  });
-});
-```
+//board 위치 바꾸기
+if (type === 'column') {
+  const newOrder = Array.from(project.boardsOrder);
+  newOrder.splice(source.index, 1);
+  newOrder.splice(destination.index, 0, draggableId);
 
-set 함수 안에 firebase처리를 넣어서 처리한 이유는 아래 코드에서 볼 수 있듯이 element의 업데이트된 상태를 공유 할 수 있고, 프로젝트를 업데이트하는 과정을 파악하기 쉽기 때문입니다.(가독성이 좋음)
-
-```ts
-setProject((prev) => {
-  const newBoards = { ...prev.contents };
-  delete newBoards[`${boardKey}`];
-  const newProject = { ...prev, contents: newBoards };
-  const fireProcess = async () => {
-    await updateProject(project.id, newProject);
-  };
-  fireProcess();
-  return newProject;
-});
+  const newProject: IProject = { ...project, boardsOrder: newOrder };
+  //optimistic ui
+  setProject(newProject);
+  const updateBoardsOrder = async () => updateProject(projectId, newProject);
+  updateBoardsOrder();
+}
 ```
 
 <br/>
