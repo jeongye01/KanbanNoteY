@@ -37,6 +37,7 @@ notion이나 trello서비스에서 볼 수 있는 칸반노트를 구현해 보�
 
 - firebase Auth
 - firebase Cloud Firestore
+- onSnapshot
 
 ---
 
