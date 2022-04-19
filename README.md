@@ -83,7 +83,7 @@ notion이나 trello서비스에서 볼 수 있는 칸반노트를 구현해 보�
 
 > #### optimistic ui
 
-board나 task를 옮기는 과정에서 clode firebase가 업데이트 되는 것을 기다리면 옮긴 것이 바로 적용되지 않음
+board나 task를 옮기는 과정에서 firebase의 database가 업데이트 되는 것을 기다리면 옮긴 것이 바로 적용되지 않음
 따라서, db 업데이트 전에 state를 set해둠.
 
 ```ts
