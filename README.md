@@ -2,8 +2,6 @@
 
 ### 구현 결과
 
-Click [here]()
-
 ![Hnet com-image (1)](https://user-images.githubusercontent.com/74299317/165036437-ea304779-f017-4473-82fc-3fa388edc29b.gif)
 
 🏠 사이트 주소
