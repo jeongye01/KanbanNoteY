@@ -2,9 +2,9 @@
 
 ### 구현 결과
 
-Click [here](http://www.naver.com)
+Click [here]()
 
-## ![image description](https://search.pstatic.net/sunny/?src=https%3A%2F%2Fi.pinimg.com%2F736x%2Fb6%2F30%2Fd6%2Fb630d6637954ba0379fb7702d32ee471.jpg&type=a340)
+## ![image description]()
 
 🏠 사이트 주소
 https://yanban-note.netlify.app/
