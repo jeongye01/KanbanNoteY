@@ -81,14 +81,19 @@ function Login() {
             계정이 아직 없으신가요? <Link to={'/signup'}>회원가입</Link>
           </LinkMessage>
         </Form>
-        {
-       /*<LinkMessage>
-          가입없이 <button onClick={guestLogin}>게스트 로그인 &rarr;</button>
-        </LinkMessage>*/
-}
       </Wrapper>
     </Container>
   );
 }
 
 export default Login;
+
+/*
+ {
+       <LinkMessage>
+          가입없이 <button onClick={guestLogin}>게스트 로그인 &rarr;</button>
+        </LinkMessage>
+      }
+
+
+*/
