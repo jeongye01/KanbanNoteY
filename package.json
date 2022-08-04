@@ -1,6 +1,6 @@
 {
   "name": "kanbam-note-y",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.3.0",
