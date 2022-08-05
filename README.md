@@ -42,44 +42,6 @@ notion이나 trello서비스에서 볼 수 있는 칸반노트를 구현해 보�
 
 ---
 
-### 📁프로젝트 구조
-
-```
-📦src
- ┣ 📂Atoms         <--application state의 source of truth 폴더. state들을 위한 폴더
- ┃ ┣ 📜project.ts  <--현재 보고 있는 프로젝트의 state
- ┃ ┗ 📜user.ts     <--현재 사용자의 state
- ┣ 📂Components
- ┃ ┣ 📂AddProjectModal <--프로젝트를 추가하는 모달
- ┃ ┣ 📂Board           <--Board (remove,rename,task 추가)
- ┃ ┣ 📂EachProject     <--각각의 프로젝트, 왼쪽 사이드바에 표시됨, and 프로젝트 rename,remove
- ┃ ┣ 📂EditRemoveBox   <--element를 삭제하거나 수정하는 컴포넌트
- ┃ ┣ 📂Input           <--element Input 컴포넌트, form에 포함되어 사용될 수 있음
- ┃ ┣ 📂Menu            <--user display or mutate modal
- ┃ ┣ 📂Modal           <--project mutate modal
- ┃ ┣ 📂ProjectList     <--왼쪽 사이드바에 표시됨
- ┃ ┗ 📂Task            <--board 안에 포함되어 있음. task read,remove,rename
- ┃
- ┣ 📂Layouts
- ┃ ┗ 📂Workspace       <--layout, 왼쪽 사이드바,헤더를 포함하며. url params 에 따라 project가 띄어지게 됨.
- ┃
- ┣ 📂Pages
- ┃ ┣ 📂Home
- ┃ ┣ 📂Login
- ┃ ┣ 📂Project
- ┃ ┗ 📂SignUp
- ┣ 📂Typings           <--Type들을(interface) 를 정리해둔 폴더
- ┃ ┗ 📜db.ts           <--IUser,IProject,Itask,IboardInfo,IboardsOrder,ProjectByNameAndId...
- ┣ 📜App.tsx
- ┣ 📜firebase.ts       <--firebase setting, 프로젝트에 사용될 함수들 정의 ex)createUser,logout,updateProject...
- ┣ 📜index.tsx
- ┣ 📜Router.tsx
- ┣ 📜styled.d.ts
- ┗ 📜Styles.ts
-```
-
----
-
 ### 👨‍💻 프로젝트 Issues
 
 > #### optimistic ui
@@ -163,27 +125,19 @@ useEffect(() => {
 
 ---
 
-### Getting Started
+### 0.2.0 변경사항
 
-```
-$ git clone https://github.com/jeongye01/KanbanNoteY.git
-$ npm install
-$ npm start
-```
+1. 배포 환경 → netlify 그대로
+2. 기술 스택
+
+➖ styled-components 
+
+➕ emotion (MUI5 도입으로 인함)
+
+➕ MUI5
+
+3. 추가 기능  **오답 노트 서비스로 리팩토링 할 것임**
+
 
 ---
 
-Todo
-
-- [X]login
-- [X]signup
-- [X]project list read
-- [X]project create
-- [X]project rename
-- [X]project delete
-
-- []board list read
-- []board create
-- []board rename
-- []board delete
-- []board 위치 바꾸기
