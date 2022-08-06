@@ -130,14 +130,13 @@ useEffect(() => {
 1. 배포 환경 → netlify 그대로
 2. 기술 스택
 
-➖ styled-components 
+➖ styled-components
 
 ➕ emotion (MUI5 도입으로 인함)
 
 ➕ MUI5
 
-3. 추가 기능  **오답 노트 서비스로 리팩토링 할 것임**
-
+3. 추가 기능 **오답 노트 서비스로 리팩토링 할 것임**
+   .
 
 ---
-
