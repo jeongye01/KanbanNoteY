@@ -14,6 +14,7 @@ function Home() {
   }, [projectId]);
   return (
     <Workspace>
+      <button>login</button>
       {isHome ? (
         <HomeContainer>
           <Bubble>

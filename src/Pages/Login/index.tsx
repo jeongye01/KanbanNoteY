@@ -4,12 +4,44 @@ import { Container, Wrapper, Logo, Form, Error, Submit, LinkMessage } from '../S
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { login } from '../../firebase';
 
+import * as React from 'react';
+import Button from '@mui/material/Button';
+import TextField from '@mui/material/TextField';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+import LoginModal from '../../Modals/Login';
+
 interface IFormInputs {
   email: string;
   password: string;
   loginResult?: string;
 }
 
+export default function Login() {
+  const [open, setOpen] = React.useState(false);
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  return (
+    <div>
+      <Button variant="outlined" onClick={handleClickOpen}>
+        Open form dialog
+      </Button>
+      <LoginModal open={open} handleClose={handleClose} />
+    </div>
+  );
+}
+
+/*
 function Login() {
   const history = useHistory();
   const {
@@ -45,6 +77,8 @@ function Login() {
       <Wrapper>
         <Logo to={'#'}>yanban✅</Logo>
         <Form onSubmit={handleSubmit(onSubmit)}>
+          <button onClick={() => {}}>로그인 모달 버튼</button>
+          <Dialog open={true} />
           <h1>로그인</h1>
 
           <span>이메일</span>
